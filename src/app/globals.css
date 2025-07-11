@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 :root {
+  /* Typography */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  
   /* Light mode - Modern color palette */
   --background: #fafbff;
   --foreground: #1a1d29;

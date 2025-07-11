@@ -107,7 +107,11 @@ export function DataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className={isInactive ? "bg-gray-100/70 hover:bg-gray-200/80 opacity-60" : ""}
+                    className={`transition-colors duration-200 ${
+                      isInactive 
+                        ? "bg-gray-50 hover:bg-gray-100 opacity-60" 
+                        : "hover:bg-gray-50/80"
+                    }`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className={isInactive ? "text-gray-500" : ""}>
