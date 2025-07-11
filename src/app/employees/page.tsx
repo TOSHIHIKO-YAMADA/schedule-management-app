@@ -17,16 +17,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+// import {
+//   AlertDialog,
+//   AlertDialogAction,
+//   AlertDialogCancel,
+//   AlertDialogContent,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+// } from '@/components/ui/alert-dialog';
 import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { DeleteEmployeeDialog } from '@/components/employees/DeleteEmployeeDialog';
@@ -44,7 +44,6 @@ export default function EmployeesPage() {
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   // APIからデータを取得
   const { data: employees = [], isLoading, error, refetch } = useQuery({
@@ -149,7 +148,6 @@ export default function EmployeesPage() {
     onSuccess: (data) => {
       alert(data.message);
       setSelectedEmployeeIds(new Set());
-      setBulkDeleteDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ['employees'] });
     },
     onError: (error) => {
@@ -163,12 +161,12 @@ export default function EmployeesPage() {
       alert('削除する従業員を選択してください');
       return;
     }
-    setBulkDeleteDialogOpen(true);
-  };
-
-  const confirmBulkDelete = () => {
-    const ids = Array.from(selectedEmployeeIds);
-    bulkDeleteMutation.mutate(ids);
+    
+    const confirmMessage = `選択した${selectedEmployeeIds.size}人の従業員情報を完全に削除します。\nこの操作は元に戻すことができません。本当に削除しますか？`;
+    if (confirm(confirmMessage)) {
+      const ids = Array.from(selectedEmployeeIds);
+      bulkDeleteMutation.mutate(ids);
+    }
   };
 
   const handleRowClick = (employee: Employee) => {
@@ -480,29 +478,7 @@ export default function EmployeesPage() {
         />
       )}
 
-      {/* 一括削除確認ダイアログ */}
-      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>従業員の一括削除</AlertDialogTitle>
-            <AlertDialogDescription>
-              選択した<strong>{selectedEmployeeIds.size}人</strong>の従業員情報を完全に削除します。
-              <br />
-              この操作は元に戻すことができません。本当に削除しますか？
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>キャンセル</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmBulkDelete}
-              className="bg-red-600 hover:bg-red-700 text-white"
-              disabled={bulkDeleteMutation.isPending}
-            >
-              {bulkDeleteMutation.isPending ? '削除中...' : '削除する'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Note: AlertDialog temporarily replaced with confirm() for compatibility */}
     </div>
   );
 }
