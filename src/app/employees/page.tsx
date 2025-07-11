@@ -90,18 +90,21 @@ export default function EmployeesPage() {
               従業員の情報を管理・編集できます
             </p>
           </div>
-          <Button onClick={handleNewEmployee}>
-            <Plus className="mr-2 h-4 w-4" />
+          <Button 
+            onClick={handleNewEmployee}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
             新規従業員追加
           </Button>
         </div>
 
         {/* フィルター */}
-        <div className="bg-card border border-border rounded-lg p-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   placeholder="名前、メールで検索..."
                   value={searchTerm}
@@ -136,7 +139,7 @@ export default function EmployeesPage() {
         </div>
 
         {/* データテーブル */}
-        <div className="bg-card border border-border rounded-lg">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
           <DataTable
             columns={columns}
             data={filteredEmployees}
