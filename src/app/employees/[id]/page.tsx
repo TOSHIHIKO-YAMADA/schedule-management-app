@@ -1,24 +1,17 @@
 'use client';
 
-import { useState, use, useEffect } from 'react';
+import { useState, use } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Edit, Mail, Phone, MapPin, Train, Bell, Save, X } from 'lucide-react';
-import { updateEmployeeSchema } from '@/lib/validations/employee';
+import { useQuery } from '@tanstack/react-query';
+import { ArrowLeft, Edit, User, Eye } from 'lucide-react';
 import { useAuthorization } from '@/hooks/useAuthorization';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { apiClient } from '@/lib/api-client';
 import { Employee } from '@prisma/client';
-import { z } from 'zod';
-
-type UpdateEmployeeFormData = z.infer<typeof updateEmployeeSchema>;
 
 interface EmployeeDetailPageProps {
   params: Promise<{
@@ -29,7 +22,6 @@ interface EmployeeDetailPageProps {
 export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const queryClient = useQueryClient();
   const { canEdit } = useAuthorization();
   
   // クエリパラメータから編集モードを判定
@@ -39,40 +31,11 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
   // Next.js 15でparamsはPromiseになったため、use()でアンラップ
   const { id } = use(params);
 
-  const { data: employee, isLoading, error } = useQuery({
+  const { data: employee, isLoading, error, refetch } = useQuery({
     queryKey: ['employee', id],
     queryFn: async () => {
       const response = await apiClient.get(`/employees/${id}`);
       return response.data as Employee;
-    },
-  });
-
-  const form = useForm<UpdateEmployeeFormData>({
-    resolver: zodResolver(updateEmployeeSchema),
-    defaultValues: {},
-  });
-
-  // フォームのデフォルト値を更新
-  useEffect(() => {
-    if (employee) {
-      form.reset(employee);
-    }
-  }, [employee, form]);
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: UpdateEmployeeFormData) => {
-      const response = await apiClient.put(`/employees/${id}`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['employee', id] });
-      queryClient.invalidateQueries({ queryKey: ['employees'] });
-      setIsEditing(false);
-      alert('従業員情報を更新しました');
-    },
-    onError: (error) => {
-      alert('更新に失敗しました');
-      console.error('Update failed:', error);
     },
   });
 
@@ -85,12 +48,12 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
   };
 
   const handleCancel = () => {
-    form.reset(employee);
     setIsEditing(false);
   };
 
-  const handleSubmit = (data: UpdateEmployeeFormData) => {
-    updateMutation.mutate(data);
+  const handleSuccess = () => {
+    setIsEditing(false);
+    refetch();
   };
 
   if (isLoading) {
@@ -134,338 +97,221 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-4xl mx-auto">
           {/* ヘッダー */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-4 mb-4">
               <Button
                 variant="outline"
-                size="sm"
                 onClick={handleBack}
-                className="flex items-center gap-2"
+                className="bg-white/80 border-2 border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-md"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4 mr-2" />
                 戻る
               </Button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">従業員詳細</h1>
-                <p className="text-gray-600 mt-1">従業員の詳細情報を確認できます</p>
+              
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full">
+                {isEditing ? (
+                  <Edit className="w-8 h-8 text-white" />
+                ) : (
+                  <Eye className="w-8 h-8 text-white" />
+                )}
               </div>
+              
+              {!isEditing && canEdit && (
+                <Button
+                  onClick={handleEdit}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  <Edit className="h-4 w-4" />
+                  編集モード
+                </Button>
+              )}
             </div>
-            {!isEditing && canEdit && (
-              <Button
-                onClick={handleEdit}
-                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
-              >
-                <Edit className="h-4 w-4" />
-                編集する
-              </Button>
-            )}
-            {isEditing && (
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="flex items-center gap-2"
-                >
-                  <X className="h-4 w-4" />
-                  キャンセル
-                </Button>
-                <Button
-                  type="submit"
-                  form="employee-form"
-                  disabled={!form.formState.isDirty || updateMutation.isPending}
-                  className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
-                >
-                  <Save className="h-4 w-4" />
-                  {updateMutation.isPending ? '更新中...' : '更新する'}
-                </Button>
-              </div>
-            )}
+            
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              {isEditing ? '従業員情報編集' : '従業員詳細'}
+            </h1>
+            <p className="text-lg text-gray-600 mb-2">
+              {employee.name}さんの情報を{isEditing ? '編集' : '確認'}できます
+            </p>
+            
+            <div className="flex items-center justify-center gap-3">
+              <Badge variant={isActive ? 'success' : 'inactive'} className="text-sm px-3 py-1">
+                {isActive ? 'アクティブ' : '非アクティブ'}
+              </Badge>
+              <span className="text-gray-500">•</span>
+              <span className="text-gray-600 font-medium">{employee.department}</span>
+            </div>
           </div>
 
-          {/* メインカード */}
-          <form
-            id="employee-form"
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl shadow-indigo-100/50 overflow-hidden"
-          >
-            {/* 基本情報セクション */}
-            <div className="p-8 border-b border-gray-100">
-              <div className="flex items-start justify-between">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    {isEditing ? (
-                      <>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-gray-700">氏名</label>
-                            <Input 
-                              {...form.register('name')} 
-                              inputMode="text"
-                              className="mt-1" 
-                            />
-                            {form.formState.errors.name && (
-                              <p className="text-sm text-red-500 mt-1">{form.formState.errors.name.message}</p>
-                            )}
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-gray-700">ふりがな</label>
-                            <Input 
-                              {...form.register('nameKana')} 
-                              inputMode="text"
-                              className="mt-1" 
-                            />
-                            {form.formState.errors.nameKana && (
-                              <p className="text-sm text-red-500 mt-1">{form.formState.errors.nameKana.message}</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-gray-700">ステータス</label>
-                            <Select
-                              value={form.watch('status')}
-                              onValueChange={(value) => form.setValue('status', value, { shouldDirty: true })}
-                            >
-                              <SelectTrigger className="mt-1 bg-white border-2 border-gray-300 hover:border-blue-400 focus:border-blue-500 shadow-sm">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent className="bg-white border-2 border-gray-300 shadow-xl">
-                                <SelectItem value="ACTIVE" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">アクティブ</SelectItem>
-                                <SelectItem value="INACTIVE" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">非アクティブ</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-gray-700">所属</label>
-                            <Input 
-                              {...form.register('department')} 
-                              inputMode="text"
-                              className="mt-1" 
-                            />
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <h2 className="text-2xl font-bold text-gray-900">{employee.name}</h2>
-                        <p className="text-lg text-gray-600">{employee.nameKana}</p>
-                        <div className="flex items-center gap-2">
-                          <Badge variant={isActive ? 'success' : 'inactive'}>
-                            {isActive ? 'アクティブ' : '非アクティブ'}
-                          </Badge>
-                          <span className="text-sm text-gray-500">
-                            {employee.department}
-                          </span>
-                        </div>
-                      </>
-                    )}
+          {/* プログレス表示（編集モード時のみ） */}
+          {isEditing && (
+            <div className="mb-8">
+              <div className="flex items-center justify-center space-x-4">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    1
                   </div>
+                  <span className="ml-2 text-sm font-medium text-blue-600">情報編集</span>
+                </div>
+                <div className="flex-1 h-1 bg-gray-200 rounded max-w-20"></div>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm font-medium">
+                    2
+                  </div>
+                  <span className="ml-2 text-sm font-medium text-gray-500">確認・保存</span>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* 詳細情報 */}
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* 連絡先情報 */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
-                  連絡先情報
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Mail className="h-4 w-4 text-blue-600" />
+          {/* フォームカード */}
+          <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl shadow-2xl shadow-indigo-100/50 overflow-hidden">
+            <div className="p-8">
+              {isEditing ? (
+                <EmployeeForm 
+                  employee={employee}
+                  onSuccess={handleSuccess}
+                  onCancel={handleCancel}
+                />
+              ) : (
+                <div className="space-y-8">
+                  {/* 基本情報表示セクション */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 pb-4 border-b border-gradient-to-r from-blue-200 to-indigo-200">
+                      <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-900">基本情報</h3>
+                        <p className="text-sm text-gray-600">従業員の基本的な情報</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-500">メールアドレス</p>
-                      {isEditing ? (
-                        <>
-                          <Input 
-                            {...form.register('email')} 
-                            type="email" 
-                            inputMode="email"
-                            className="mt-1" 
-                          />
-                          {form.formState.errors.email && (
-                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.email.message}</p>
-                          )}
-                        </>
-                      ) : (
-                        <p className="font-medium text-gray-900">{employee.email}</p>
-                      )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700">氏名</label>
+                        <p className="text-lg font-medium text-gray-900 bg-gray-50/50 border-2 border-gray-200 rounded-xl px-4 py-3">
+                          {employee.name}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700">ふりがな</label>
+                        <p className="text-lg font-medium text-gray-900 bg-gray-50/50 border-2 border-gray-200 rounded-xl px-4 py-3">
+                          {employee.nameKana}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                      <Phone className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-500">電話番号</p>
-                      {isEditing ? (
-                        <>
-                          <Input 
-                            {...form.register('phone')} 
-                            type="tel" 
-                            inputMode="tel"
-                            className="mt-1" 
-                            placeholder="電話番号を入力" 
-                          />
-                          {form.formState.errors.phone && (
-                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.phone.message}</p>
-                          )}
-                        </>
-                      ) : (
-                        <p className="font-medium text-gray-900">{employee.phone || '未設定'}</p>
-                      )}
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700">所属</label>
+                      <p className="text-lg font-medium text-gray-900 bg-gray-50/50 border-2 border-gray-200 rounded-xl px-4 py-3">
+                        {employee.department}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                      <span className="text-xs font-bold text-green-600">LINE</span>
+                  {/* 連絡先情報表示セクション */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 pb-4 border-b border-gradient-to-r from-green-200 to-blue-200">
+                      <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-600 to-blue-600 rounded-xl">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-900">連絡先情報</h3>
+                        <p className="text-sm text-gray-600">メールアドレスや電話番号などの連絡先</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-500">LINE ID</p>
-                      {isEditing ? (
-                        <>
-                          <Input 
-                            {...form.register('lineId')} 
-                            inputMode="text"
-                            autoCapitalize="none"
-                            className="mt-1" 
-                            placeholder="LINE IDを入力" 
-                          />
-                          {form.formState.errors.lineId && (
-                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.lineId.message}</p>
-                          )}
-                        </>
-                      ) : (
-                        <p className="font-medium text-gray-900">{employee.lineId || '未設定'}</p>
-                      )}
-                    </div>
-                  </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <Bell className="h-4 w-4 text-purple-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-500">通知方法</p>
-                      {isEditing ? (
-                        <>
-                          <Select
-                            value={form.watch('notificationMethod')}
-                            onValueChange={(value) => form.setValue('notificationMethod', value, { shouldDirty: true })}
-                          >
-                            <SelectTrigger className="mt-1 bg-white border-2 border-gray-300 hover:border-blue-400 focus:border-blue-500 shadow-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white border-2 border-gray-300 shadow-xl">
-                              <SelectItem value="email" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">メール</SelectItem>
-                              <SelectItem value="line" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">LINE</SelectItem>
-                              <SelectItem value="both" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">メール・LINE</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          {form.formState.errors.notificationMethod && (
-                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.notificationMethod.message}</p>
-                          )}
-                        </>
-                      ) : (
-                        <p className="font-medium text-gray-900">
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700">メールアドレス</label>
+                        <p className="text-lg font-medium text-gray-900 bg-gray-50/50 border-2 border-gray-200 rounded-xl px-4 py-3">
+                          {employee.email}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-gray-700">電話番号</label>
+                          <p className="text-lg font-medium text-gray-900 bg-gray-50/50 border-2 border-gray-200 rounded-xl px-4 py-3">
+                            {employee.phone || '未設定'}
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-semibold text-gray-700">LINE ID</label>
+                          <p className="text-lg font-medium text-gray-900 bg-gray-50/50 border-2 border-gray-200 rounded-xl px-4 py-3">
+                            {employee.lineId || '未設定'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700">通知方法</label>
+                        <p className="text-lg font-medium text-gray-900 bg-gray-50/50 border-2 border-gray-200 rounded-xl px-4 py-3">
                           {employee.notificationMethod === 'email' ? 'メール' : 
                            employee.notificationMethod === 'line' ? 'LINE' : 
                            employee.notificationMethod === 'both' ? 'メール・LINE' : employee.notificationMethod}
                         </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 勤務情報 */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
-                  勤務情報
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                      <MapPin className="h-4 w-4 text-orange-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-500">最寄り駅</p>
-                      {isEditing ? (
-                        <>
-                          <Input 
-                            {...form.register('nearestStation')} 
-                            inputMode="text"
-                            className="mt-1" 
-                            placeholder="最寄り駅を入力" 
-                          />
-                          {form.formState.errors.nearestStation && (
-                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.nearestStation.message}</p>
-                          )}
-                        </>
-                      ) : (
-                        <p className="font-medium text-gray-900">{employee.nearestStation}</p>
-                      )}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                      <Train className="h-4 w-4 text-indigo-600" />
+                  {/* 勤務情報表示セクション */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 pb-4 border-b border-gradient-to-r from-purple-200 to-pink-200">
+                      <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-900">勤務情報</h3>
+                        <p className="text-sm text-gray-600">勤務先や通勤に関する情報</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-500">主な通勤手段</p>
-                      {isEditing ? (
-                        <>
-                          <Select
-                            value={form.watch('transportation')}
-                            onValueChange={(value) => form.setValue('transportation', value, { shouldDirty: true })}
-                          >
-                            <SelectTrigger className="mt-1 bg-white border-2 border-gray-300 hover:border-blue-400 focus:border-blue-500 shadow-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white border-2 border-gray-300 shadow-xl">
-                              <SelectItem value="train" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">電車</SelectItem>
-                              <SelectItem value="car" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">車</SelectItem>
-                              <SelectItem value="bicycle" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">自転車</SelectItem>
-                              <SelectItem value="walk" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">徒歩</SelectItem>
-                              <SelectItem value="bus" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">バス</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          {form.formState.errors.transportation && (
-                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.transportation.message}</p>
-                          )}
-                        </>
-                      ) : (
-                        <p className="font-medium text-gray-900">
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700">最寄り駅</label>
+                      <p className="text-lg font-medium text-gray-900 bg-gray-50/50 border-2 border-gray-200 rounded-xl px-4 py-3">
+                        {employee.nearestStation}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700">主な通勤手段</label>
+                        <p className="text-lg font-medium text-gray-900 bg-gray-50/50 border-2 border-gray-200 rounded-xl px-4 py-3">
                           {employee.transportation === 'train' ? '電車' :
                            employee.transportation === 'car' ? '車' :
                            employee.transportation === 'bicycle' ? '自転車' :
                            employee.transportation === 'walk' ? '徒歩' :
                            employee.transportation === 'bus' ? 'バス' : employee.transportation}
                         </p>
-                      )}
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700">ステータス</label>
+                        <p className="text-lg font-medium text-gray-900 bg-gray-50/50 border-2 border-gray-200 rounded-xl px-4 py-3">
+                          {isActive ? 'アクティブ' : '非アクティブ'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* メタ情報 */}
+                  <div className="pt-6 border-t border-gray-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-500">
+                      <div>
+                        <span className="font-medium">作成日:</span> {new Date(employee.createdAt).toLocaleString('ja-JP')}
+                      </div>
+                      <div>
+                        <span className="font-medium">更新日:</span> {new Date(employee.updatedAt).toLocaleString('ja-JP')}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
-
-            {/* メタ情報 */}
-            <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100">
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>作成日: {new Date(employee.createdAt).toLocaleString('ja-JP')}</span>
-                <span>更新日: {new Date(employee.updatedAt).toLocaleString('ja-JP')}</span>
-              </div>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
