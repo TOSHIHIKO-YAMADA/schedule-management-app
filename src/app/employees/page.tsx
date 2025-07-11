@@ -151,8 +151,9 @@ export default function EmployeesPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="space-y-6">
         {/* ヘッダー */}
         <div className="flex justify-between items-center">
           <div>
@@ -186,56 +187,59 @@ export default function EmployeesPage() {
           </div>
         </div>
 
-        {/* フィルター */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="名前、メールで検索..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+        {/* メインカード */}
+        <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-xl shadow-indigo-100/50 overflow-hidden">
+          {/* フィルター */}
+          <div className="p-6 border-b border-gray-100/80 bg-gradient-to-r from-white/50 to-gray-50/30">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">検索・フィルター</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="md:col-span-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="名前、メールで検索..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-white/70 border-gray-200/60 focus:bg-white focus:border-blue-300 transition-all"
+                  />
+                </div>
               </div>
+              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                <SelectTrigger className="bg-white/70 border-gray-200/60 focus:bg-white focus:border-blue-300">
+                  <SelectValue placeholder="部署で絞り込み" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">すべての部署</SelectItem>
+                  <SelectItem value="営業部">営業部</SelectItem>
+                  <SelectItem value="開発部">開発部</SelectItem>
+                  <SelectItem value="管理部">管理部</SelectItem>
+                  <SelectItem value="企画部">企画部</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="bg-white/70 border-gray-200/60 focus:bg-white focus:border-blue-300">
+                  <SelectValue placeholder="ステータスで絞り込み" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">すべてのステータス</SelectItem>
+                  <SelectItem value="ACTIVE">アクティブ</SelectItem>
+                  <SelectItem value="INACTIVE">非アクティブ</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="部署で絞り込み" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">すべての部署</SelectItem>
-                <SelectItem value="営業部">営業部</SelectItem>
-                <SelectItem value="開発部">開発部</SelectItem>
-                <SelectItem value="管理部">管理部</SelectItem>
-                <SelectItem value="企画部">企画部</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="ステータスで絞り込み" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">すべてのステータス</SelectItem>
-                <SelectItem value="ACTIVE">アクティブ</SelectItem>
-                <SelectItem value="INACTIVE">非アクティブ</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
-        </div>
 
-        {/* データテーブル */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          {/* データテーブル */}
+          <div className="bg-white/60">
           <DataTable
             columns={columns}
             data={currentEmployees}
           />
           
           {/* 統合ページネーション */}
-          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-5 border-t border-gray-100 bg-gray-50/50">
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-5 border-t border-gray-100/60 bg-gradient-to-r from-blue-50/30 to-indigo-50/30">
             <div className="flex items-center gap-6 mb-4 sm:mb-0">
-              <div className="text-sm font-medium text-gray-700">
+              <div className="text-sm font-medium text-gray-700 bg-white/70 px-3 py-1 rounded-md border border-gray-200/60">
                 {totalItems === 0 ? '0件のデータ' : `${startIndex + 1}-${Math.min(endIndex, totalItems)}件 / 全${totalItems}件`}
               </div>
               <div className="flex items-center gap-3">
@@ -244,14 +248,14 @@ export default function EmployeesPage() {
                   value={itemsPerPage.toString()} 
                   onValueChange={(value) => handleItemsPerPageChange(Number(value))}
                 >
-                  <SelectTrigger className="w-20 h-9 bg-white border-gray-300 shadow-sm">
+                  <SelectTrigger className="w-20 h-9 bg-gradient-to-r from-white to-blue-50 border-2 border-blue-200 shadow-md hover:border-blue-400 hover:shadow-lg transition-all duration-200 font-semibold text-blue-700">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
+                  <SelectContent className="bg-white border-2 border-blue-200 shadow-xl">
+                    <SelectItem value="10" className="hover:bg-blue-50 text-gray-700 font-medium">10件</SelectItem>
+                    <SelectItem value="20" className="hover:bg-blue-50 text-gray-700 font-medium">20件</SelectItem>
+                    <SelectItem value="50" className="hover:bg-blue-50 text-gray-700 font-medium">50件</SelectItem>
+                    <SelectItem value="100" className="hover:bg-blue-50 text-gray-700 font-medium">100件</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -332,8 +336,10 @@ export default function EmployeesPage() {
               </div>
             </div>
           </div>
+          </div>
         </div>
       </div>
+    </div>
 
       {/* 削除確認ダイアログ */}
       {selectedEmployee && (
