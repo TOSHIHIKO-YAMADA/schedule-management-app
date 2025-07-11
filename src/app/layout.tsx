@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { ClerkProvider } from '@clerk/nextjs';
 import { ColoredTopLoader } from "@/components/layout/ColoredTopLoader";
+import Navigation from "@/components/layout/Navigation";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import "./globals.css";
 
@@ -42,6 +43,8 @@ export default function RootLayout({
             >
               {/* 統一されたローディングバー */}
               <ColoredTopLoader />
+              {/* ナビゲーション */}
+              <Navigation />
               {children}
             </ThemeProvider>
           </QueryProvider>
