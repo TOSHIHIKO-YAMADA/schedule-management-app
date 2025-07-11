@@ -197,14 +197,22 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="text-sm font-medium text-gray-700">氏名</label>
-                            <Input {...form.register('name')} className="mt-1" />
+                            <Input 
+                              {...form.register('name')} 
+                              inputMode="text"
+                              className="mt-1" 
+                            />
                             {form.formState.errors.name && (
                               <p className="text-sm text-red-500 mt-1">{form.formState.errors.name.message}</p>
                             )}
                           </div>
                           <div>
                             <label className="text-sm font-medium text-gray-700">ふりがな</label>
-                            <Input {...form.register('nameKana')} className="mt-1" />
+                            <Input 
+                              {...form.register('nameKana')} 
+                              inputMode="text"
+                              className="mt-1" 
+                            />
                             {form.formState.errors.nameKana && (
                               <p className="text-sm text-red-500 mt-1">{form.formState.errors.nameKana.message}</p>
                             )}
@@ -228,11 +236,19 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                           </div>
                           <div>
                             <label className="text-sm font-medium text-gray-700">所属</label>
-                            <Input {...form.register('department')} className="mt-1" />
+                            <Input 
+                              {...form.register('department')} 
+                              inputMode="text"
+                              className="mt-1" 
+                            />
                           </div>
                           <div>
                             <label className="text-sm font-medium text-gray-700">役職</label>
-                            <Input {...form.register('position')} className="mt-1" />
+                            <Input 
+                              {...form.register('position')} 
+                              inputMode="text"
+                              className="mt-1" 
+                            />
                           </div>
                         </div>
                       </>
@@ -271,7 +287,12 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                       <p className="text-sm text-gray-500">メールアドレス</p>
                       {isEditing ? (
                         <>
-                          <Input {...form.register('email')} type="email" className="mt-1" />
+                          <Input 
+                            {...form.register('email')} 
+                            type="email" 
+                            inputMode="email"
+                            className="mt-1" 
+                          />
                           {form.formState.errors.email && (
                             <p className="text-sm text-red-500 mt-1">{form.formState.errors.email.message}</p>
                           )}
@@ -290,7 +311,13 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                       <p className="text-sm text-gray-500">電話番号</p>
                       {isEditing ? (
                         <>
-                          <Input {...form.register('phone')} type="tel" className="mt-1" placeholder="電話番号を入力" />
+                          <Input 
+                            {...form.register('phone')} 
+                            type="tel" 
+                            inputMode="tel"
+                            className="mt-1" 
+                            placeholder="電話番号を入力" 
+                          />
                           {form.formState.errors.phone && (
                             <p className="text-sm text-red-500 mt-1">{form.formState.errors.phone.message}</p>
                           )}
@@ -309,7 +336,13 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                       <p className="text-sm text-gray-500">LINE ID</p>
                       {isEditing ? (
                         <>
-                          <Input {...form.register('lineId')} className="mt-1" placeholder="LINE IDを入力" />
+                          <Input 
+                            {...form.register('lineId')} 
+                            inputMode="text"
+                            autoCapitalize="none"
+                            className="mt-1" 
+                            placeholder="LINE IDを入力" 
+                          />
                           {form.formState.errors.lineId && (
                             <p className="text-sm text-red-500 mt-1">{form.formState.errors.lineId.message}</p>
                           )}
@@ -371,7 +404,12 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                       <p className="text-sm text-gray-500">最寄り駅</p>
                       {isEditing ? (
                         <>
-                          <Input {...form.register('nearestStation')} className="mt-1" placeholder="最寄り駅を入力" />
+                          <Input 
+                            {...form.register('nearestStation')} 
+                            inputMode="text"
+                            className="mt-1" 
+                            placeholder="最寄り駅を入力" 
+                          />
                           {form.formState.errors.nearestStation && (
                             <p className="text-sm text-red-500 mt-1">{form.formState.errors.nearestStation.message}</p>
                           )}
