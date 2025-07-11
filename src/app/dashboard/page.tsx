@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Navigation from "@/components/layout/Navigation";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Calendar, Clock, CheckCircle, AlertCircle, TrendingUp, Users, Bell, Plus, Car, Building2 } from "lucide-react";
 import Link from "next/link";
@@ -48,7 +47,6 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-background">
-        <Navigation />
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <PageTransition>
           <div className="px-4 py-6 sm:px-0">

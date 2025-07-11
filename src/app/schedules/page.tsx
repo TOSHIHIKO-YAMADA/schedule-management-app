@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Navigation from "@/components/layout/Navigation";
 import { Calendar, List, Search, Plus, SlidersHorizontal, Download } from "lucide-react";
 import Link from "next/link";
 import { schedules, categorySettings } from "@/lib/mockData";
@@ -38,7 +37,6 @@ export default function SchedulesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <PageTransition>
           <div className="px-4 py-6 sm:px-0">
