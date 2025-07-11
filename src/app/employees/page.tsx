@@ -30,6 +30,7 @@ import {
 import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { DeleteEmployeeDialog } from '@/components/employees/DeleteEmployeeDialog';
+import { ImportDialog } from '@/components/employees/ImportDialog';
 import { createEmployeeTableColumns } from '@/components/employees/EmployeeTableColumns';
 import { apiClient } from '@/lib/api-client';
 
@@ -44,6 +45,7 @@ export default function EmployeesPage() {
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // APIからデータを取得
   const { data: employees = [], isLoading, error, refetch } = useQuery({
@@ -120,17 +122,22 @@ export default function EmployeesPage() {
     }
   };
 
-  // 新しい機能のプレースホルダー関数
+  // インポート・エクスポート機能
   const handleImport = () => {
-    alert('インポート機能は実装予定です');
+    setImportDialogOpen(true);
   };
 
-  const handleExport = () => {
-    alert('エクスポート機能は実装予定です');
+  const handleExport = async () => {
+    try {
+      window.open('/api/employees/export', '_blank');
+    } catch (error) {
+      alert('エクスポートに失敗しました');
+      console.error('Export failed:', error);
+    }
   };
 
   const handleDownloadSample = () => {
-    alert('サンプルダウンロード機能は実装予定です');
+    window.open('/api/employees/sample', '_blank');
   };
 
   // 一括削除のmutation
@@ -472,6 +479,15 @@ export default function EmployeesPage() {
           }}
         />
       )}
+
+      {/* インポートダイアログ */}
+      <ImportDialog
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
+        onSuccess={() => {
+          refetch();
+        }}
+      />
 
       {/* Note: AlertDialog temporarily replaced with confirm() for compatibility */}
     </div>
