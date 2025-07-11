@@ -61,13 +61,16 @@ export default function DashboardPage() {
               <div className="flex space-x-3">
                 <InteractiveButton
                   variant="secondary"
-                  className="border border-border shadow-soft"
+                  className="bg-white text-gray-700 border border-gray-300 shadow-sm hover:bg-gray-50"
                 >
                   <Bell className="w-4 h-4 mr-2" />
                   通知設定
                 </InteractiveButton>
                 <Link href="/schedules/new">
-                  <InteractiveButton variant="primary">
+                  <InteractiveButton 
+                    variant="primary"
+                    className="bg-blue-600 text-white hover:bg-blue-700"
+                  >
                     <Plus className="w-4 h-4 mr-2" />
                     新規作成
                   </InteractiveButton>
