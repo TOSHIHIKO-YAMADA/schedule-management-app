@@ -109,10 +109,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // 既存データを削除してから挿入
+    await prisma.employee.deleteMany({});
+    
     // バッチ挿入
     const createdEmployees = await prisma.employee.createMany({
       data: employees,
-      skipDuplicates: true, // 重複するメールアドレスをスキップ
     });
 
     return NextResponse.json({
