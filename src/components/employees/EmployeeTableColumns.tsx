@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { Employee } from '@/types/employee';
+import { Employee } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Mail, Phone, Edit, Trash2 } from 'lucide-react';
@@ -14,40 +14,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-const roleLabels = {
-  super: 'スーパー管理者',
-  admin: '管理者',
-  limited_admin: '制限付き管理者',
-  general: '一般',
-};
+interface EmployeeTableColumnsProps {
+  onEdit: (employee: Employee) => void;
+  onDelete: (employee: Employee) => void;
+}
 
-const roleColors = {
-  super: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  admin: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  limited_admin: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  general: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-};
-
-export const EmployeeTableColumns: ColumnDef<Employee>[] = [
-  {
-    accessorKey: 'employeeNumber',
-    header: '社員番号',
-    cell: ({ row }) => (
-      <div className="font-mono text-sm">{row.getValue('employeeNumber')}</div>
-    ),
-  },
+export const createEmployeeTableColumns = ({
+  onEdit,
+  onDelete,
+}: EmployeeTableColumnsProps): ColumnDef<Employee>[] => [
   {
     accessorKey: 'name',
-    header: '氏名',
-    cell: ({ row }) => {
-      const employee = row.original;
-      return (
-        <div>
-          <div className="font-medium">{employee.name}</div>
-          <div className="text-sm text-muted-foreground">{employee.nameKana}</div>
-        </div>
-      );
-    },
+    header: '従業員名',
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue('name')}</div>
+    ),
   },
   {
     accessorKey: 'email',
@@ -60,10 +41,12 @@ export const EmployeeTableColumns: ColumnDef<Employee>[] = [
             <Mail className="h-3 w-3 text-muted-foreground" />
             <span>{employee.email}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Phone className="h-3 w-3 text-muted-foreground" />
-            <span>{employee.phone}</span>
-          </div>
+          {employee.phone && (
+            <div className="flex items-center gap-2 text-sm">
+              <Phone className="h-3 w-3 text-muted-foreground" />
+              <span>{employee.phone}</span>
+            </div>
+          )}
         </div>
       );
     },
@@ -76,35 +59,18 @@ export const EmployeeTableColumns: ColumnDef<Employee>[] = [
     ),
   },
   {
-    accessorKey: 'role',
-    header: '権限',
-    cell: ({ row }) => {
-      const role = row.getValue('role') as keyof typeof roleLabels;
-      return (
-        <Badge className={roleColors[role]}>
-          {roleLabels[role]}
-        </Badge>
-      );
-    },
+    accessorKey: 'position',
+    header: '役職',
+    cell: ({ row }) => (
+      <div className="text-sm">{row.getValue('position')}</div>
+    ),
   },
   {
-    accessorKey: 'nearestStation',
-    header: '最寄り駅',
-    cell: ({ row }) => {
-      const employee = row.original;
-      return (
-        <div className="text-sm">
-          <div>{employee.nearestStation}</div>
-          <div className="text-muted-foreground">{employee.transportation}</div>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'isActive',
+    accessorKey: 'status',
     header: 'ステータス',
     cell: ({ row }) => {
-      const isActive = row.getValue('isActive');
+      const status = row.getValue('status') as string;
+      const isActive = status === 'ACTIVE';
       return (
         <Badge variant={isActive ? 'default' : 'secondary'}>
           {isActive ? 'アクティブ' : '非アクティブ'}
@@ -128,12 +94,15 @@ export const EmployeeTableColumns: ColumnDef<Employee>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>アクション</DropdownMenuLabel>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdit(employee)}>
               <Edit className="mr-2 h-4 w-4" />
               編集
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem 
+              className="text-destructive"
+              onClick={() => onDelete(employee)}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               削除
             </DropdownMenuItem>
