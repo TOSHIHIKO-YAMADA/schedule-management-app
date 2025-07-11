@@ -222,12 +222,12 @@ export default function EmployeesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-indigo-100">
       <div className="container mx-auto px-6 py-8 max-w-7xl">
         {/* ヘッダーセクション */}
         <div className="mb-8 relative">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-indigo-600/5 rounded-2xl blur-3xl"></div>
-          <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-6 shadow-xl">
+          <div className="relative bg-gradient-to-r from-white via-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6 shadow-2xl">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
@@ -295,7 +295,7 @@ export default function EmployeesPage() {
         </div>
 
         {/* フィルター・検索セクション */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg p-6 mb-6">
+        <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-pink-200 rounded-xl shadow-lg p-6 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -336,7 +336,7 @@ export default function EmployeesPage() {
         </div>
 
         {/* メインコンテンツ（データテーブル） */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-br from-green-50 to-teal-50 border-2 border-green-200 rounded-xl shadow-lg overflow-hidden">
 
           {/* 選択状態とアクション */}
           {selectedEmployeeIds.size > 0 && (
