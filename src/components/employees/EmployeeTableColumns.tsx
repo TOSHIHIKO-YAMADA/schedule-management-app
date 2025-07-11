@@ -4,10 +4,9 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Employee } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Mail, Phone, Edit, Trash2 } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 
 interface EmployeeTableColumnsProps {
-  onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
   onRowClick: (employee: Employee) => void;
   selectedEmployeeIds: Set<string>;
@@ -17,7 +16,6 @@ interface EmployeeTableColumnsProps {
 }
 
 export const createEmployeeTableColumns = ({
-  onEdit,
   onDelete,
   onRowClick,
   selectedEmployeeIds,
@@ -136,25 +134,6 @@ export const createEmployeeTableColumns = ({
             {isActive ? 'アクティブ' : '非アクティブ'}
           </Badge>
         </div>
-      );
-    },
-  },
-  {
-    id: 'actions',
-    header: '編集',
-    cell: ({ row }) => {
-      const employee = row.original;
-
-      return (
-        <Button
-          onClick={() => onEdit(employee)}
-          variant="outline"
-          size="sm"
-          className="h-8 px-3 text-blue-600 border-blue-200 hover:bg-blue-100 hover:border-blue-400 hover:text-blue-700 transition-all duration-200"
-        >
-          <Edit className="h-3 w-3 mr-1" />
-          編集
-        </Button>
       );
     },
   },

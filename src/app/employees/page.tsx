@@ -87,10 +87,6 @@ export default function EmployeesPage() {
     setSelectedEmployeeIds(new Set());
   };
 
-  const handleEdit = (employee: Employee) => {
-    router.push(`/employees/${employee.id}/edit`);
-  };
-
   const handleDelete = (employee: Employee) => {
     setSelectedEmployee(employee);
     setDeleteDialogOpen(true);
@@ -194,7 +190,6 @@ export default function EmployeesPage() {
   };
 
   const columns = createEmployeeTableColumns({
-    onEdit: handleEdit,
     onDelete: handleDelete,
     onRowClick: handleRowClick,
     selectedEmployeeIds,
