@@ -462,7 +462,6 @@ export default function EmployeesPage() {
           </div>
         </div>
       </div>
-    </div>
 
       {/* 削除確認ダイアログ */}
       {selectedEmployee && (
