@@ -57,6 +57,10 @@ npm run lint
 ## 開発環境要件
 - Node.js 18.x 以上
 - npm または yarn
+- Git
+
+### Windows環境での開発
+Windows環境で開発する場合は、[WINDOWS_SETUP.md](./WINDOWS_SETUP.md)を参照してください。
 
 ## 認証設定
 Clerk認証を使用。環境変数に認証情報が必要。
