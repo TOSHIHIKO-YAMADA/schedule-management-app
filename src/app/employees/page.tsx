@@ -226,30 +226,30 @@ export default function EmployeesPage() {
       <div className="container mx-auto px-6 py-8 max-w-7xl">
         {/* ヘッダーセクション */}
         <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div className="space-y-1">
               <h1 className="text-3xl font-bold text-gray-900 tracking-tight">従業員管理</h1>
-              <p className="text-gray-600 mt-2 text-lg">
-                チームメンバーの情報を効率的に管理できます
+              <p className="text-gray-600 text-lg">
+                チーム全体の情報を効率的に管理・運用
               </p>
             </div>
             <div className="flex items-center gap-3">
               <Button 
                 onClick={handleNewEmployee}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 font-medium shadow-sm hover:shadow-md transition-all duration-200"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-lg"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                従業員を新規登録
+                新規登録
               </Button>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
                     variant="outline"
-                    className="border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                    className="border-gray-300 hover:border-gray-400 hover:bg-gray-50 px-4 py-3 rounded-lg shadow-sm"
                   >
                     <MoreHorizontal className="h-4 w-4 mr-2" />
-                    その他の操作
+                    その他
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -283,26 +283,26 @@ export default function EmployeesPage() {
         </div>
 
         {/* フィルター・検索セクション */}
-        <div className="bg-white rounded-lg border shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <Input
-                  placeholder="名前、メールアドレスで検索..."
+                  placeholder="従業員名、メールアドレス、部署で検索..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  className="pl-12 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg text-base shadow-sm"
                 />
               </div>
             </div>
             <div className="flex gap-3">
               <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                <SelectTrigger className="w-40 h-10 border-gray-300">
-                  <SelectValue placeholder="所属" />
+                <SelectTrigger className="w-44 h-12 border-gray-300 rounded-lg shadow-sm">
+                  <SelectValue placeholder="所属部署" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">すべての所属</SelectItem>
+                  <SelectItem value="all">すべての部署</SelectItem>
                   <SelectItem value="営業部">営業部</SelectItem>
                   <SelectItem value="開発部">開発部</SelectItem>
                   <SelectItem value="管理部">管理部</SelectItem>
@@ -310,7 +310,7 @@ export default function EmployeesPage() {
                 </SelectContent>
               </Select>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-40 h-10 border-gray-300">
+                <SelectTrigger className="w-40 h-12 border-gray-300 rounded-lg shadow-sm">
                   <SelectValue placeholder="ステータス" />
                 </SelectTrigger>
                 <SelectContent>
@@ -324,7 +324,7 @@ export default function EmployeesPage() {
         </div>
 
         {/* メインコンテンツ（データテーブル） */}
-        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
 
           {/* 選択状態とアクション */}
           {selectedEmployeeIds.size > 0 && (
