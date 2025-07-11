@@ -87,9 +87,12 @@ export const createEmployeeTableColumns = ({
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button 
+              variant="ghost" 
+              className="h-8 w-8 p-0 hover:bg-gray-100 border border-gray-200 rounded"
+            >
               <span className="sr-only">メニューを開く</span>
-              <MoreHorizontal className="h-4 w-4" />
+              <MoreHorizontal className="h-4 w-4 text-gray-600" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
