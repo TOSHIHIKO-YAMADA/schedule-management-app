@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, Trash2, MoreHorizontal, Upload, Download, FileText, TestTube } from 'lucide-react';
 import { Employee } from '@prisma/client';
 import { DataTable } from '@/components/ui/DataTable';
@@ -17,6 +17,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { DeleteEmployeeDialog } from '@/components/employees/DeleteEmployeeDialog';
@@ -25,6 +35,7 @@ import { apiClient } from '@/lib/api-client';
 
 export default function EmployeesPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -33,6 +44,7 @@ export default function EmployeesPage() {
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   // APIからデータを取得
   const { data: employees = [], isLoading, error, refetch } = useQuery({
@@ -126,6 +138,43 @@ export default function EmployeesPage() {
     alert('サンプルダウンロード機能は実装予定です');
   };
 
+  // 一括削除のmutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const response = await apiClient.delete('/employees', {
+        data: { ids }
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      alert(data.message);
+      setSelectedEmployeeIds(new Set());
+      setBulkDeleteDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+    },
+    onError: (error) => {
+      alert('一括削除に失敗しました');
+      console.error('Bulk delete failed:', error);
+    },
+  });
+
+  const handleBulkDelete = () => {
+    if (selectedEmployeeIds.size === 0) {
+      alert('削除する従業員を選択してください');
+      return;
+    }
+    setBulkDeleteDialogOpen(true);
+  };
+
+  const confirmBulkDelete = () => {
+    const ids = Array.from(selectedEmployeeIds);
+    bulkDeleteMutation.mutate(ids);
+  };
+
+  const handleRowClick = (employee: Employee) => {
+    router.push(`/employees/${employee.id}`);
+  };
+
   // 選択機能のハンドラー
   const handleSelectEmployee = (employeeId: string, checked: boolean) => {
     const newSelected = new Set(selectedEmployeeIds);
@@ -149,6 +198,7 @@ export default function EmployeesPage() {
   const columns = createEmployeeTableColumns({
     onEdit: handleEdit,
     onDelete: handleDelete,
+    onRowClick: handleRowClick,
     selectedEmployeeIds,
     onSelectEmployee: handleSelectEmployee,
     onSelectAll: handleSelectAll,
@@ -280,6 +330,35 @@ export default function EmployeesPage() {
             </div>
           </div>
 
+          {/* 選択状態とアクション */}
+          {selectedEmployeeIds.size > 0 && (
+            <div className="px-6 py-4 bg-blue-50/80 border-b border-blue-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium text-blue-700">
+                    {selectedEmployeeIds.size}件選択中
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedEmployeeIds(new Set())}
+                    className="text-blue-600 border-blue-200 hover:bg-blue-100"
+                  >
+                    選択を解除
+                  </Button>
+                </div>
+                <Button
+                  onClick={handleBulkDelete}
+                  className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+                  disabled={bulkDeleteMutation.isPending}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {bulkDeleteMutation.isPending ? '削除中...' : '選択した項目を削除'}
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* データテーブル */}
           <div className="bg-white/60">
           <DataTable
@@ -400,6 +479,30 @@ export default function EmployeesPage() {
           }}
         />
       )}
+
+      {/* 一括削除確認ダイアログ */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>従業員の一括削除</AlertDialogTitle>
+            <AlertDialogDescription>
+              選択した<strong>{selectedEmployeeIds.size}人</strong>の従業員情報を完全に削除します。
+              <br />
+              この操作は元に戻すことができません。本当に削除しますか？
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>キャンセル</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmBulkDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={bulkDeleteMutation.isPending}
+            >
+              {bulkDeleteMutation.isPending ? '削除中...' : '削除する'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

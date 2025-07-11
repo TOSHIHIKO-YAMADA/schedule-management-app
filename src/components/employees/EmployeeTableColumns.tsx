@@ -9,6 +9,7 @@ import { Mail, Phone, Edit, Trash2 } from 'lucide-react';
 interface EmployeeTableColumnsProps {
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
+  onRowClick: (employee: Employee) => void;
   selectedEmployeeIds: Set<string>;
   onSelectEmployee: (employeeId: string, checked: boolean) => void;
   onSelectAll: (checked: boolean) => void;
@@ -18,6 +19,7 @@ interface EmployeeTableColumnsProps {
 export const createEmployeeTableColumns = ({
   onEdit,
   onDelete,
+  onRowClick,
   selectedEmployeeIds,
   onSelectEmployee,
   onSelectAll,
@@ -69,7 +71,10 @@ export const createEmployeeTableColumns = ({
     cell: ({ row }) => {
       const employee = row.original;
       return (
-        <div className="space-y-1">
+        <div 
+          className="space-y-1 cursor-pointer" 
+          onClick={() => onRowClick(employee)}
+        >
           <div className="text-xs text-gray-500">{employee.nameKana}</div>
           <div className="font-medium">{employee.name}</div>
         </div>
@@ -82,7 +87,10 @@ export const createEmployeeTableColumns = ({
     cell: ({ row }) => {
       const employee = row.original;
       return (
-        <div className="space-y-1">
+        <div 
+          className="space-y-1 cursor-pointer" 
+          onClick={() => onRowClick(employee)}
+        >
           <div className="flex items-center gap-2 text-sm">
             <Mail className="h-3 w-3 text-gray-400" />
             <span>{employee.email}</span>
@@ -100,20 +108,34 @@ export const createEmployeeTableColumns = ({
   {
     accessorKey: 'department',
     header: '所属',
-    cell: ({ row }) => (
-      <div className="text-sm font-medium">{row.getValue('department')}</div>
-    ),
+    cell: ({ row }) => {
+      const employee = row.original;
+      return (
+        <div 
+          className="text-sm font-medium cursor-pointer" 
+          onClick={() => onRowClick(employee)}
+        >
+          {row.getValue('department')}
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'status',
     header: 'ステータス',
     cell: ({ row }) => {
+      const employee = row.original;
       const status = row.getValue('status') as string;
       const isActive = status === 'ACTIVE';
       return (
-        <Badge variant={isActive ? 'success' : 'inactive'}>
-          {isActive ? 'アクティブ' : '非アクティブ'}
-        </Badge>
+        <div 
+          className="cursor-pointer" 
+          onClick={() => onRowClick(employee)}
+        >
+          <Badge variant={isActive ? 'success' : 'inactive'}>
+            {isActive ? 'アクティブ' : '非アクティブ'}
+          </Badge>
+        </div>
       );
     },
   },

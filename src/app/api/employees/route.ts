@@ -62,3 +62,47 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// DELETE /api/employees - 一括削除
+export async function DELETE(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { ids } = body;
+
+    // IDs配列の検証
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return NextResponse.json(
+        { error: '削除対象のIDが指定されていません' },
+        { status: 400 }
+      );
+    }
+
+    // すべてのIDが文字列かチェック
+    if (!ids.every(id => typeof id === 'string')) {
+      return NextResponse.json(
+        { error: '無効なIDが含まれています' },
+        { status: 400 }
+      );
+    }
+
+    // 削除実行
+    const result = await prisma.employee.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return NextResponse.json({
+      message: `${result.count}件の従業員データを削除しました`,
+      count: result.count,
+    });
+  } catch (error) {
+    console.error('Failed to delete employees:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete employees' },
+      { status: 500 }
+    );
+  }
+}
