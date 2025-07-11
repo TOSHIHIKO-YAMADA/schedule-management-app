@@ -62,8 +62,27 @@ npm run lint
 ### Windows環境での開発
 Windows環境で開発する場合は、[WINDOWS_SETUP.md](./WINDOWS_SETUP.md)を参照してください。
 
-## 認証設定
-Clerk認証を使用。環境変数に認証情報が必要。
+## 環境設定
+
+### 認証設定
+Clerk認証を使用。`.env.local`ファイルに以下の環境変数を設定：
+
+```bash
+# Clerk認証（必要に応じて設定）
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+
+# データベース
+DATABASE_URL="file:./prisma/dev.db"
+
+# 開発時の認証バイパス（推奨）
+NEXT_PUBLIC_SKIP_AUTH=true
+```
+
+### 開発時の注意点
+- `NEXT_PUBLIC_SKIP_AUTH=true`を設定することで認証なしでAPI開発が可能
+- Clerkの"keyless mode"警告は無視して問題なし
+- 従業員管理機能のテストが可能
 
 ## Claude Code連携
 GitHub Actionsで`@claude`コメントによるAI支援が利用可能。
