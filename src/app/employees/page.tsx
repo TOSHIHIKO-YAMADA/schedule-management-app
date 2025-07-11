@@ -222,36 +222,47 @@ export default function EmployeesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
       <div className="container mx-auto px-6 py-8 max-w-7xl">
         {/* ヘッダーセクション */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-            <div className="space-y-1">
-              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">従業員管理</h1>
-              <p className="text-gray-600 text-lg">
-                チーム全体の情報を効率的に管理・運用
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button 
-                onClick={handleNewEmployee}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-lg"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                新規登録
-              </Button>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline"
-                    className="border-gray-300 hover:border-gray-400 hover:bg-gray-50 px-4 py-3 rounded-lg shadow-sm"
-                  >
-                    <MoreHorizontal className="h-4 w-4 mr-2" />
-                    その他
-                  </Button>
-                </DropdownMenuTrigger>
+        <div className="mb-8 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-indigo-600/5 rounded-2xl blur-3xl"></div>
+          <div className="relative bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-6 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent tracking-tight">従業員管理</h1>
+                    <p className="text-gray-600 text-lg">
+                      チーム全体の情報を効率的に管理・運用
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button 
+                  onClick={handleNewEmployee}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  新規登録
+                </Button>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline"
+                      className="bg-white/50 backdrop-blur-sm border-white/20 hover:bg-white/80 px-4 py-3 rounded-xl shadow-sm"
+                    >
+                      <MoreHorizontal className="h-4 w-4 mr-2" />
+                      その他
+                    </Button>
+                  </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>データ操作</DropdownMenuLabel>
                   <DropdownMenuItem onClick={handleImport}>
@@ -277,13 +288,14 @@ export default function EmployeesPage() {
                     全データ削除
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
         </div>
 
         {/* フィルター・検索セクション */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
+        <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg p-6 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -324,11 +336,11 @@ export default function EmployeesPage() {
         </div>
 
         {/* メインコンテンツ（データテーブル） */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg overflow-hidden">
 
           {/* 選択状態とアクション */}
           {selectedEmployeeIds.size > 0 && (
-            <div className="px-6 py-4 bg-blue-50 border-b">
+            <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <span className="text-sm font-medium text-blue-700">
@@ -365,7 +377,7 @@ export default function EmployeesPage() {
           </div>
           
           {/* フッターセクション（ページネーション） */}
-          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t bg-gray-50/50">
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t bg-gradient-to-r from-gray-50/50 to-slate-50/50">
             <div className="flex items-center gap-6 mb-4 sm:mb-0">
               <div className="text-sm text-gray-600">
                 {totalItems === 0 ? '0件のデータ' : `${startIndex + 1}-${Math.min(endIndex, totalItems)}件 / 全${totalItems}件`}

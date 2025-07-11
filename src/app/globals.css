@@ -22,6 +22,10 @@
   --accent-foreground: #1a1d29;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
+  --success: #059669;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
   --border: #e2e8f0;
   --input: #f1f5f9;
   --ring: #4f46e5;
@@ -46,6 +50,10 @@
   --accent-foreground: #fafafa;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
   --border: #27272a;
   --input: #1e1e22;
   --ring: #6366f1;
