@@ -111,7 +111,7 @@ export const createEmployeeTableColumns = ({
       const status = row.getValue('status') as string;
       const isActive = status === 'ACTIVE';
       return (
-        <Badge variant={isActive ? 'default' : 'secondary'}>
+        <Badge variant={isActive ? 'success' : 'inactive'}>
           {isActive ? 'アクティブ' : '非アクティブ'}
         </Badge>
       );
@@ -128,7 +128,7 @@ export const createEmployeeTableColumns = ({
           onClick={() => onEdit(employee)}
           variant="outline"
           size="sm"
-          className="h-8 px-3 text-blue-600 border-blue-200 hover:bg-blue-50"
+          className="h-8 px-3 text-blue-600 border-blue-200 hover:bg-blue-100 hover:border-blue-400 hover:text-blue-700 transition-all duration-200"
         >
           <Edit className="h-3 w-3 mr-1" />
           編集

@@ -226,25 +226,25 @@ export default function EmployeesPage() {
         </div>
 
         {/* データテーブル */}
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
           <DataTable
             columns={columns}
             data={currentEmployees}
           />
           
-          {/* ページネーション */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-700">
-                {totalItems === 0 ? '0件' : `${startIndex + 1}-${Math.min(endIndex, totalItems)}件 / 全${totalItems}件`}
+          {/* 統合ページネーション */}
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-5 border-t border-gray-100 bg-gray-50/50">
+            <div className="flex items-center gap-6 mb-4 sm:mb-0">
+              <div className="text-sm font-medium text-gray-700">
+                {totalItems === 0 ? '0件のデータ' : `${startIndex + 1}-${Math.min(endIndex, totalItems)}件 / 全${totalItems}件`}
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-700">表示件数:</span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-gray-700">表示件数:</span>
                 <Select 
                   value={itemsPerPage.toString()} 
                   onValueChange={(value) => handleItemsPerPageChange(Number(value))}
                 >
-                  <SelectTrigger className="w-20">
+                  <SelectTrigger className="w-20 h-9 bg-white border-gray-300 shadow-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -257,12 +257,22 @@ export default function EmployeesPage() {
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1}
+                className="px-3 h-9 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50"
+              >
+                最初
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
+                className="px-3 h-9 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50"
               >
                 前へ
               </Button>
@@ -286,7 +296,11 @@ export default function EmployeesPage() {
                       variant={currentPage === pageNum ? "default" : "outline"}
                       size="sm"
                       onClick={() => handlePageChange(pageNum)}
-                      className="w-8 h-8 p-0"
+                      className={`w-9 h-9 p-0 ${
+                        currentPage === pageNum 
+                          ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                          : 'hover:bg-blue-50 hover:border-blue-300'
+                      }`}
                     >
                       {pageNum}
                     </Button>
@@ -299,11 +313,21 @@ export default function EmployeesPage() {
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages || totalPages === 0}
+                className="px-3 h-9 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50"
               >
                 次へ
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="px-3 h-9 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50"
+              >
+                最後
+              </Button>
               
-              <div className="text-sm text-gray-700 ml-2">
+              <div className="text-sm font-medium text-gray-600 ml-3 px-3 py-1 bg-white rounded-md border border-gray-200">
                 {totalPages > 0 ? `${currentPage} / ${totalPages}ページ` : '0 / 0ページ'}
               </div>
             </div>
