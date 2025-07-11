@@ -4,18 +4,33 @@ export const createEmployeeSchema = z.object({
   name: z.string()
     .min(1, "従業員名は必須です")
     .max(100, "従業員名は100文字以内で入力してください"),
+  nameKana: z.string()
+    .min(1, "ふりがなは必須です")
+    .max(100, "ふりがなは100文字以内で入力してください"),
   email: z.string()
     .email("有効なメールアドレスを入力してください")
     .max(255, "メールアドレスは255文字以内で入力してください"),
   phone: z.string()
-    .min(1, "電話番号は必須です")
-    .max(20, "電話番号は20文字以内で入力してください"),
+    .max(20, "電話番号は20文字以内で入力してください")
+    .optional(),
+  lineId: z.string()
+    .max(50, "LINE IDは50文字以内で入力してください")
+    .optional(),
+  notificationMethod: z.enum(["email", "line", "both"], {
+    required_error: "通知方法を選択してください",
+  }),
   department: z.string()
-    .min(1, "部署は必須です")
-    .max(100, "部署は100文字以内で入力してください"),
+    .min(1, "所属は必須です")
+    .max(100, "所属は100文字以内で入力してください"),
   position: z.string()
-    .min(1, "役職は必須です")
-    .max(100, "役職は100文字以内で入力してください"),
+    .max(100, "役職は100文字以内で入力してください")
+    .optional(),
+  nearestStation: z.string()
+    .min(1, "最寄り駅は必須です")
+    .max(100, "最寄り駅は100文字以内で入力してください"),
+  transportation: z.enum(["train", "car", "bicycle", "walk", "bus"], {
+    required_error: "主な通勤手段を選択してください",
+  }),
   status: z.enum(["ACTIVE", "INACTIVE"], {
     required_error: "ステータスを選択してください",
   }),

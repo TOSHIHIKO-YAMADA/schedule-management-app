@@ -7,8 +7,14 @@ import { EmployeeForm } from "@/components/employees/EmployeeForm";
 export default function NewEmployeePage() {
   const router = useRouter();
 
-  const handleSuccess = () => {
-    router.push("/employees");
+  const handleSuccess = (data?: any) => {
+    if (data && data.id) {
+      // 作成された従業員の詳細画面（編集モード）に遷移
+      router.push(`/employees/${data.id}?edit=true`);
+    } else {
+      // データがない場合は一覧に戻る
+      router.push("/employees");
+    }
   };
 
   const handleCancel = () => {

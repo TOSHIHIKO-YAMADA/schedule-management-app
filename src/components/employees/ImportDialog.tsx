@@ -187,7 +187,7 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
                 <ul className="text-xs space-y-1 list-disc list-inside">
                   <li>ID、作成日、更新日は自動生成されるため入力不要です</li>
                   <li>既存のメールアドレスと重複するデータはスキップされます</li>
-                  <li>必須項目: 氏名、ふりがな、メールアドレス、所属、役職、最寄り駅</li>
+                  <li>必須項目: 氏名、ふりがな、メールアドレス、所属、最寄り駅</li>
                   <li>サンプルファイルを参考に正しい形式で作成してください</li>
                 </ul>
               </div>

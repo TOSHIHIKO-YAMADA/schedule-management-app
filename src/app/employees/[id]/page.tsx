@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, use, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,9 +28,13 @@ interface EmployeeDetailPageProps {
 
 export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const { canEdit } = useAuthorization();
-  const [isEditing, setIsEditing] = useState(false);
+  
+  // クエリパラメータから編集モードを判定
+  const shouldStartEditing = searchParams.get('edit') === 'true';
+  const [isEditing, setIsEditing] = useState(shouldStartEditing);
   
   // Next.js 15でparamsはPromiseになったため、use()でアンラップ
   const { id } = use(params);
@@ -218,7 +222,7 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                             )}
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="text-sm font-medium text-gray-700">ステータス</label>
                             <Select
@@ -242,14 +246,6 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                               className="mt-1" 
                             />
                           </div>
-                          <div>
-                            <label className="text-sm font-medium text-gray-700">役職</label>
-                            <Input 
-                              {...form.register('position')} 
-                              inputMode="text"
-                              className="mt-1" 
-                            />
-                          </div>
                         </div>
                       </>
                     ) : (
@@ -261,7 +257,7 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                             {isActive ? 'アクティブ' : '非アクティブ'}
                           </Badge>
                           <span className="text-sm text-gray-500">
-                            {employee.department} / {employee.position}
+                            {employee.department}
                           </span>
                         </div>
                       </>

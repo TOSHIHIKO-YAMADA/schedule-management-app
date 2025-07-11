@@ -116,15 +116,14 @@ export async function POST(request: NextRequest) {
         const lineId = fields[5].trim() || null;
         const notificationMethod = notificationMethodMap[fields[6].trim()] || 'email';
         const department = fields[7].replace(/^"(.+)"$/, '$1').trim();
-        const position = fields[8].replace(/^"(.+)"$/, '$1').trim();
-        const nearestStation = fields[9].replace(/^"(.+)"$/, '$1').trim();
+        const nearestStation = fields[8].replace(/^"(.+)"$/, '$1').trim();
         
         // フィールド数に応じて柔軟に対応
-        const transportation = fields.length > 10 ? (transportationMap[fields[10].trim()] || 'train') : 'train';
-        const status = fields.length > 11 ? (statusMap[fields[11].trim()] || 'ACTIVE') : 'ACTIVE';
+        const transportation = fields.length > 9 ? (transportationMap[fields[9].trim()] || 'train') : 'train';
+        const status = fields.length > 10 ? (statusMap[fields[10].trim()] || 'ACTIVE') : 'ACTIVE';
 
         // バリデーション
-        if (!name || !nameKana || !email || !department || !position || !nearestStation) {
+        if (!name || !nameKana || !email || !department || !nearestStation) {
           errors.push(`行 ${i + 2}: 必須フィールドが入力されていません`);
           continue;
         }
@@ -144,7 +143,6 @@ export async function POST(request: NextRequest) {
           lineId,
           notificationMethod,
           department,
-          position,
           nearestStation,
           transportation,
           status

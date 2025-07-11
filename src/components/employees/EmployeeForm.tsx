@@ -33,7 +33,7 @@ import { Employee } from "@prisma/client";
 
 interface EmployeeFormProps {
   employee?: Employee;
-  onSuccess?: () => void;
+  onSuccess?: (data?: any) => void;
   onCancel?: () => void;
 }
 
@@ -45,18 +45,26 @@ export function EmployeeForm({ employee, onSuccess, onCancel }: EmployeeFormProp
     resolver: zodResolver(isEdit ? updateEmployeeSchema : createEmployeeSchema),
     defaultValues: employee ? {
       name: employee.name,
+      nameKana: employee.nameKana,
       email: employee.email,
       phone: employee.phone || "",
+      lineId: employee.lineId || "",
+      notificationMethod: employee.notificationMethod,
       department: employee.department,
-      position: employee.position,
+      nearestStation: employee.nearestStation,
+      transportation: employee.transportation,
       status: employee.status,
     } : {
       name: "",
+      nameKana: "",
       email: "",
       phone: "",
+      lineId: "",
+      notificationMethod: "email" as const,
       department: "",
-      position: "",
-      status: "ACTIVE",
+      nearestStation: "",
+      transportation: "train" as const,
+      status: "ACTIVE" as const,
     },
   });
 
@@ -65,10 +73,10 @@ export function EmployeeForm({ employee, onSuccess, onCancel }: EmployeeFormProp
       const response = await apiClient.post('/employees', data);
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       form.reset();
-      onSuccess?.();
+      onSuccess?.(data); // 作成されたemployeeデータを渡す
     },
   });
 
@@ -97,19 +105,43 @@ export function EmployeeForm({ employee, onSuccess, onCancel }: EmployeeFormProp
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>従業員名</FormLabel>
-              <FormControl>
-                <Input placeholder="従業員名を入力" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>氏名</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="従業員名を入力" 
+                    inputMode="text"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="nameKana"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>ふりがな</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="フリガナを入力" 
+                    inputMode="text"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
@@ -120,6 +152,7 @@ export function EmployeeForm({ employee, onSuccess, onCancel }: EmployeeFormProp
               <FormControl>
                 <Input 
                   type="email" 
+                  inputMode="email"
                   placeholder="example@company.com" 
                   {...field} 
                 />
@@ -129,43 +162,127 @@ export function EmployeeForm({ employee, onSuccess, onCancel }: EmployeeFormProp
           )}
         />
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>電話番号（任意）</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="tel"
+                    inputMode="tel"
+                    placeholder="090-1234-5678" 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="lineId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>LINE ID（任意）</FormLabel>
+                <FormControl>
+                  <Input 
+                    inputMode="text"
+                    autoCapitalize="none"
+                    placeholder="LINE IDを入力" 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
-          name="phone"
+          name="notificationMethod"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>電話番号</FormLabel>
-              <FormControl>
-                <Input placeholder="090-1234-5678" {...field} />
-              </FormControl>
+              <FormLabel>通知方法</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger className="bg-white border-2 border-gray-300 hover:border-blue-400 focus:border-blue-500 shadow-sm">
+                    <SelectValue placeholder="通知方法を選択" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="bg-white border-2 border-gray-300 shadow-xl">
+                  <SelectItem value="email" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">メール</SelectItem>
+                  <SelectItem value="line" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">LINE</SelectItem>
+                  <SelectItem value="both" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">メール・LINE</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="department"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>部署</FormLabel>
-              <FormControl>
-                <Input placeholder="開発部" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="department"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>所属</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="開発部" 
+                    inputMode="text"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="nearestStation"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>最寄り駅</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="新宿駅" 
+                    inputMode="text"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
-          name="position"
+          name="transportation"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>役職</FormLabel>
-              <FormControl>
-                <Input placeholder="エンジニア" {...field} />
-              </FormControl>
+              <FormLabel>主な通勤手段</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger className="bg-white border-2 border-gray-300 hover:border-blue-400 focus:border-blue-500 shadow-sm">
+                    <SelectValue placeholder="通勤手段を選択" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="bg-white border-2 border-gray-300 shadow-xl">
+                  <SelectItem value="train" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">電車</SelectItem>
+                  <SelectItem value="car" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">車</SelectItem>
+                  <SelectItem value="bicycle" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">自転車</SelectItem>
+                  <SelectItem value="walk" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">徒歩</SelectItem>
+                  <SelectItem value="bus" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">バス</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

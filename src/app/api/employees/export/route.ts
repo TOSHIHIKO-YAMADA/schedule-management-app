@@ -21,7 +21,6 @@ export async function GET(request: NextRequest) {
       'LINE ID',
       '通知方法',
       '所属',
-      '役職',
       '最寄り駅',
       '主な通勤手段',
       'ステータス',
@@ -43,7 +42,6 @@ export async function GET(request: NextRequest) {
         employee.notificationMethod === 'line' ? 'LINE' : 
         employee.notificationMethod === 'both' ? 'メール・LINE' : employee.notificationMethod,
         `"${employee.department}"`,
-        `"${employee.position}"`,
         `"${employee.nearestStation}"`,
         employee.transportation === 'train' ? '電車' :
         employee.transportation === 'car' ? '車' :
