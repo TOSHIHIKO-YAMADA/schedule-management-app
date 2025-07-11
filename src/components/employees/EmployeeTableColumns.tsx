@@ -100,15 +100,9 @@ export const createEmployeeTableColumns = ({
   {
     accessorKey: 'department',
     header: '所属',
-    cell: ({ row }) => {
-      const employee = row.original;
-      return (
-        <div className="space-y-1">
-          <div className="text-sm font-medium">{employee.department}</div>
-          <div className="text-xs text-gray-500">{employee.position}</div>
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="text-sm font-medium">{row.getValue('department')}</div>
+    ),
   },
   {
     accessorKey: 'status',

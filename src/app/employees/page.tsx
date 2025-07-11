@@ -23,6 +23,8 @@ export default function EmployeesPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Set<string>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   // APIからデータを取得
   const { data: employees = [], isLoading, error, refetch } = useQuery({
@@ -45,6 +47,26 @@ export default function EmployeesPage() {
     
     return matchesSearch && matchesDepartment && matchesStatus;
   });
+
+  // ページネーション計算
+  const totalItems = filteredEmployees.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentEmployees = filteredEmployees.slice(startIndex, endIndex);
+
+  // ページ変更時に選択をリセット
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSelectedEmployeeIds(new Set());
+  };
+
+  // 表示件数変更時にページを1に戻す
+  const handleItemsPerPageChange = (items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+    setSelectedEmployeeIds(new Set());
+  };
 
   const handleEdit = (employee: Employee) => {
     router.push(`/employees/${employee.id}/edit`);
@@ -96,7 +118,7 @@ export default function EmployeesPage() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const allIds = new Set(filteredEmployees.map((emp: Employee) => emp.id));
+      const allIds = new Set(currentEmployees.map((emp: Employee) => emp.id));
       setSelectedEmployeeIds(allIds);
     } else {
       setSelectedEmployeeIds(new Set());
@@ -109,7 +131,7 @@ export default function EmployeesPage() {
     selectedEmployeeIds,
     onSelectEmployee: handleSelectEmployee,
     onSelectAll: handleSelectAll,
-    allEmployees: filteredEmployees,
+    allEmployees: currentEmployees,
   });
 
   if (isLoading) {
@@ -207,8 +229,85 @@ export default function EmployeesPage() {
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
           <DataTable
             columns={columns}
-            data={filteredEmployees}
+            data={currentEmployees}
           />
+          
+          {/* ページネーション */}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-700">
+                {totalItems === 0 ? '0件' : `${startIndex + 1}-${Math.min(endIndex, totalItems)}件 / 全${totalItems}件`}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-700">表示件数:</span>
+                <Select 
+                  value={itemsPerPage.toString()} 
+                  onValueChange={(value) => handleItemsPerPageChange(Number(value))}
+                >
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                前へ
+              </Button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handlePageChange(pageNum)}
+                      className="w-8 h-8 p-0"
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages || totalPages === 0}
+              >
+                次へ
+              </Button>
+              
+              <div className="text-sm text-gray-700 ml-2">
+                {totalPages > 0 ? `${currentPage} / ${totalPages}ページ` : '0 / 0ページ'}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
