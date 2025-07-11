@@ -100,21 +100,32 @@ export function DataTable<TData, TValue>({
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => {
+              table.getRowModel().rows.map((row, index) => {
                 const employee = row.original as any;
                 const isInactive = employee?.status === 'INACTIVE';
+                const isSelected = row.getIsSelected();
+                const isEven = index % 2 === 0;
+                
                 return (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className={`transition-colors duration-200 ${
-                      isInactive 
-                        ? "bg-gray-50 hover:bg-gray-100 opacity-60" 
-                        : "hover:bg-gray-50/80"
-                    }`}
+                    data-state={isSelected && "selected"}
+                    className={`
+                      transition-colors duration-200 border-b
+                      ${
+                        isSelected
+                          ? "bg-blue-200 hover:bg-blue-300 border-blue-300"
+                          : isInactive
+                          ? "bg-gray-300 hover:bg-blue-200 opacity-80"
+                          : "bg-white hover:bg-blue-200"
+                      }
+                    `}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className={isInactive ? "text-gray-500" : ""}>
+                      <TableCell 
+                        key={cell.id} 
+                        className={`${isInactive ? "text-gray-600 font-medium" : "text-gray-900"}`}
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()

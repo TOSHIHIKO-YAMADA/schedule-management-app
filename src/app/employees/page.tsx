@@ -17,6 +17,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 // import {
 //   AlertDialog,
 //   AlertDialogAction,
@@ -265,28 +270,63 @@ export default function EmployeesPage() {
                   </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>データ操作</DropdownMenuLabel>
-                  <DropdownMenuItem onClick={handleImport}>
-                    <Upload className="mr-2 h-4 w-4" />
-                    インポート
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleExport}>
-                    <Download className="mr-2 h-4 w-4" />
-                    エクスポート
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDownloadSample}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    サンプル
-                  </DropdownMenuItem>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuItem onClick={handleImport}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        インポート
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>CSVファイルから従業員データを一括登録</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuItem onClick={handleExport}>
+                        <Download className="mr-2 h-4 w-4" />
+                        エクスポート
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>現在の従業員データをCSV形式でダウンロード</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuItem onClick={handleDownloadSample}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        サンプル
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>インポート用のCSVテンプレートをダウンロード</p>
+                    </TooltipContent>
+                  </Tooltip>
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel>開発用</DropdownMenuLabel>
-                  <DropdownMenuItem onClick={handleSeedData}>
-                    <TestTube className="mr-2 h-4 w-4" />
-                    ダミーデータを100件作成
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleClearData} className="text-red-600">
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    全データ削除
-                  </DropdownMenuItem>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuItem onClick={handleSeedData}>
+                        <TestTube className="mr-2 h-4 w-4" />
+                        ダミーデータを100件作成
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>テスト用の従業員データを自動生成</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuItem onClick={handleClearData} className="text-red-600">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        全データ削除
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>すべての従業員データを削除（注意：復元不可）</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -304,7 +344,7 @@ export default function EmployeesPage() {
                   placeholder="従業員名、メールアドレス、部署で検索..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg text-base shadow-sm"
+                  className="pl-12 h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg text-base shadow-sm"
                 />
               </div>
             </div>
@@ -336,11 +376,11 @@ export default function EmployeesPage() {
         </div>
 
         {/* メインコンテンツ（データテーブル） */}
-        <div className="bg-gradient-to-br from-green-50 to-teal-50 border-2 border-green-200 rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
 
           {/* 選択状態とアクション */}
           {selectedEmployeeIds.size > 0 && (
-            <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+            <div className="px-6 py-4 bg-blue-50 border-b border-blue-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <span className="text-sm font-medium text-blue-700">
@@ -377,7 +417,7 @@ export default function EmployeesPage() {
           </div>
           
           {/* フッターセクション（ページネーション） */}
-          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t bg-gradient-to-r from-gray-50/50 to-slate-50/50">
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t bg-gray-50">
             <div className="flex items-center gap-6 mb-4 sm:mb-0">
               <div className="text-sm text-gray-600">
                 {totalItems === 0 ? '0件のデータ' : `${startIndex + 1}-${Math.min(endIndex, totalItems)}件 / 全${totalItems}件`}

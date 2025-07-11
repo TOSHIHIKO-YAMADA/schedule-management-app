@@ -5,6 +5,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { ColoredTopLoader } from "@/components/layout/ColoredTopLoader";
 import Navigation from "@/components/layout/Navigation";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const inter = Inter({
@@ -43,11 +44,13 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              {/* 統一されたローディングバー */}
-              <ColoredTopLoader />
-              {/* ナビゲーション */}
-              <Navigation />
-              {children}
+              <TooltipProvider>
+                {/* 統一されたローディングバー */}
+                <ColoredTopLoader />
+                {/* ナビゲーション */}
+                <Navigation />
+                {children}
+              </TooltipProvider>
             </ThemeProvider>
           </QueryProvider>
         </ClerkProvider>
