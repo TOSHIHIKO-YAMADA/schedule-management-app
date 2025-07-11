@@ -282,41 +282,76 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                     </div>
                   </div>
                   
-                  {employee.phone && (
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Phone className="h-4 w-4 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">電話番号</p>
-                        <p className="font-medium text-gray-900">{employee.phone}</p>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <Phone className="h-4 w-4 text-green-600" />
                     </div>
-                  )}
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-500">電話番号</p>
+                      {isEditing ? (
+                        <>
+                          <Input {...form.register('phone')} type="tel" className="mt-1" placeholder="電話番号を入力" />
+                          {form.formState.errors.phone && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.phone.message}</p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="font-medium text-gray-900">{employee.phone || '未設定'}</p>
+                      )}
+                    </div>
+                  </div>
 
-                  {employee.lineId && (
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                        <span className="text-xs font-bold text-green-600">LINE</span>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">LINE ID</p>
-                        <p className="font-medium text-gray-900">{employee.lineId}</p>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <span className="text-xs font-bold text-green-600">LINE</span>
                     </div>
-                  )}
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-500">LINE ID</p>
+                      {isEditing ? (
+                        <>
+                          <Input {...form.register('lineId')} className="mt-1" placeholder="LINE IDを入力" />
+                          {form.formState.errors.lineId && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.lineId.message}</p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="font-medium text-gray-900">{employee.lineId || '未設定'}</p>
+                      )}
+                    </div>
+                  </div>
 
                   <div className="flex items-center gap-3">
                     <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                       <Bell className="h-4 w-4 text-purple-600" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="text-sm text-gray-500">通知方法</p>
-                      <p className="font-medium text-gray-900">
-                        {employee.notificationMethod === 'email' ? 'メール' : 
-                         employee.notificationMethod === 'line' ? 'LINE' : 
-                         employee.notificationMethod === 'both' ? 'メール・LINE' : employee.notificationMethod}
-                      </p>
+                      {isEditing ? (
+                        <>
+                          <Select
+                            value={form.watch('notificationMethod')}
+                            onValueChange={(value) => form.setValue('notificationMethod', value, { shouldDirty: true })}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="email">メール</SelectItem>
+                              <SelectItem value="line">LINE</SelectItem>
+                              <SelectItem value="both">メール・LINE</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {form.formState.errors.notificationMethod && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.notificationMethod.message}</p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="font-medium text-gray-900">
+                          {employee.notificationMethod === 'email' ? 'メール' : 
+                           employee.notificationMethod === 'line' ? 'LINE' : 
+                           employee.notificationMethod === 'both' ? 'メール・LINE' : employee.notificationMethod}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -332,9 +367,18 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                     <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
                       <MapPin className="h-4 w-4 text-orange-600" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="text-sm text-gray-500">最寄り駅</p>
-                      <p className="font-medium text-gray-900">{employee.nearestStation}</p>
+                      {isEditing ? (
+                        <>
+                          <Input {...form.register('nearestStation')} className="mt-1" placeholder="最寄り駅を入力" />
+                          {form.formState.errors.nearestStation && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.nearestStation.message}</p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="font-medium text-gray-900">{employee.nearestStation}</p>
+                      )}
                     </div>
                   </div>
 
@@ -342,15 +386,38 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                     <div className="flex-shrink-0 w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
                       <Train className="h-4 w-4 text-indigo-600" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="text-sm text-gray-500">主な通勤手段</p>
-                      <p className="font-medium text-gray-900">
-                        {employee.transportation === 'train' ? '電車' :
-                         employee.transportation === 'car' ? '車' :
-                         employee.transportation === 'bicycle' ? '自転車' :
-                         employee.transportation === 'walk' ? '徒歩' :
-                         employee.transportation === 'bus' ? 'バス' : employee.transportation}
-                      </p>
+                      {isEditing ? (
+                        <>
+                          <Select
+                            value={form.watch('transportation')}
+                            onValueChange={(value) => form.setValue('transportation', value, { shouldDirty: true })}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="train">電車</SelectItem>
+                              <SelectItem value="car">車</SelectItem>
+                              <SelectItem value="bicycle">自転車</SelectItem>
+                              <SelectItem value="walk">徒歩</SelectItem>
+                              <SelectItem value="bus">バス</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {form.formState.errors.transportation && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.transportation.message}</p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="font-medium text-gray-900">
+                          {employee.transportation === 'train' ? '電車' :
+                           employee.transportation === 'car' ? '車' :
+                           employee.transportation === 'bicycle' ? '自転車' :
+                           employee.transportation === 'walk' ? '徒歩' :
+                           employee.transportation === 'bus' ? 'バス' : employee.transportation}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
