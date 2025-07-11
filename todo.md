@@ -58,36 +58,40 @@
 ## 🔥 **改訂版 開発計画: 基礎から段階的にコア機能を実装**
 *開発順序: 従業員管理 → 顧客管理 → スケジュール管理*
 
-### **Phase 0: 開発基盤の整備** (1日)
-- [ ] **TanStack Query導入**
-  - [ ] `@tanstack/react-query` インストール
-  - [ ] QueryClientProviderの設定 (`app/layout.tsx`)
-  - [ ] APIリクエストラッパー関数作成 (`src/lib/api-client.ts`)
-- [ ] **共通UIコンポーネント準備**
-  - [ ] LoadingSpinnerコンポーネント作成
-  - [ ] ApiErrorAlertコンポーネント作成
-  - [ ] 共通テーブルコンポーネント設計
+### **Phase 0: 開発基盤の整備** (1日) ✅ 完了
+- [x] **TanStack Query導入**
+  - [x] `@tanstack/react-query` インストール
+  - [x] QueryClientProviderの設定 (`app/layout.tsx`)
+  - [x] APIリクエストラッパー関数作成 (`src/lib/api-client.ts`)
+- [x] **共通UIコンポーネント準備**
+  - [x] LoadingSpinnerコンポーネント作成
+  - [x] ApiErrorAlertコンポーネント作成
+  - [x] 共通テーブルコンポーネント設計
 
-### **Phase 1: 従業員管理機能** (3-4日)
-- [ ] **一覧表示 (Read)**
-  - [ ] `useEmployees` カスタムフック作成 (useQuery使用)
-  - [ ] EmployeeTableコンポーネント作成
-  - [ ] ローディング・エラー状態の実装
-- [ ] **削除機能 (Delete)**
-  - [ ] `useDeleteEmployee` フック作成 (useMutation使用)
-  - [ ] 削除確認ダイアログ実装
-  - [ ] 一覧自動更新 (invalidateQueries)
-- [ ] **新規作成 (Create)**
-  - [ ] EmployeeFormコンポーネント作成
-  - [ ] `useCreateEmployee` フック作成
-  - [ ] フォームバリデーション実装
-- [ ] **編集機能 (Update)**
-  - [ ] `useEmployee(id)` フック作成
-  - [ ] `useUpdateEmployee` フック作成
-  - [ ] 編集モード対応
-- [ ] **検索・フィルタリング**
-  - [ ] 検索入力フィールド追加
-  - [ ] 部署・役職でのフィルタリング
+### **Phase 1: 従業員管理機能** (3-4日) ✅ 完了
+- [x] **一覧表示 (Read)**
+  - [x] `useEmployees` カスタムフック作成 (useQuery使用)
+  - [x] EmployeeTableコンポーネント作成
+  - [x] ローディング・エラー状態の実装
+- [x] **削除機能 (Delete)**
+  - [x] `useDeleteEmployee` フック作成 (useMutation使用)
+  - [x] 削除確認ダイアログ実装
+  - [x] 一覧自動更新 (invalidateQueries)
+- [x] **新規作成 (Create)**
+  - [x] EmployeeFormコンポーネント作成
+  - [x] `useCreateEmployee` フック作成
+  - [x] フォームバリデーション実装
+- [x] **編集機能 (Update)**
+  - [x] `useEmployee(id)` フック作成
+  - [x] `useUpdateEmployee` フック作成
+  - [x] 編集モード対応
+- [x] **検索・フィルタリング**
+  - [x] 検索入力フィールド追加
+  - [x] 部署・役職でのフィルタリング
+- [x] **UI視認性改善** (追加実装)
+  - [x] ツールチップ機能の実装
+  - [x] テーブル背景色の最適化
+  - [x] ホバー効果の改善
 
 ### **Phase 2: 顧客管理機能** (2-3日)
 *Phase 1で確立したパターンを再利用*
@@ -175,18 +179,29 @@
 
 ### **現在の状態**
 - **基盤構築**: 完了 ✅
-- **コア機能**: 未実装 ❌
-- **アプリ稼働**: 不可 ❌
+- **Phase 0**: 完了 ✅ (TanStack Query導入)
+- **Phase 1**: 完了 ✅ (従業員管理CRUD)
+- **Phase 2以降**: 未実装 ❌
+- **アプリ稼働**: 部分的に可能（従業員管理のみ） ⚠️
 
 ### **次の最優先アクション**
-1. **TanStack Query導入**
-2. **スケジュール表示機能の実装**
-3. **基本的なCRUD操作の実現**
+1. **Phase 2: 顧客管理機能の実装**
+2. **Phase 3: スケジュール管理機能の実装**
+3. **Phase 4: ダッシュボード動的化**
 
 ### **推定完了期間**
-- **新Phase 4**: 8-11日
-- **新Phase 5**: 8-11日
-- **新Phase 6**: 8-10日
-- **合計**: 約24-32日
+- **Phase 2**: 2-3日
+- **Phase 3**: 4-5日
+- **Phase 4**: 2日
+- **Phase 5**: 8-11日
+- **Phase 6**: 8-10日
+- **残り合計**: 約24-31日
+
+### **完了済み機能**
+- ✅ 従業員の一覧表示・検索・フィルタリング
+- ✅ 従業員の新規登録・編集・削除
+- ✅ CSVインポート・エクスポート機能
+- ✅ ページネーション
+- ✅ UI視認性改善（ツールチップ、テーブル最適化）
 
 *最終更新: 2025年7月11日*
