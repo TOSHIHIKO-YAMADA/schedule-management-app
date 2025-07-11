@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     // サンプルデータ（3行のサンプル）
     const sampleData = [
       [
-        '', // ID（インポート時は空でOK）
+        '', // ID（インポート時は自動生成されるため空でOK）
         '"田中太郎"',
         '"タナカタロウ"',
         'tanaka.taro@example.com',
@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
         '"新宿駅"',
         '電車',
         'アクティブ',
-        '', // 作成日（インポート時は自動設定）
-        ''  // 更新日（インポート時は自動設定）
+        '', // 作成日（インポート時は自動生成）
+        ''  // 更新日（インポート時は自動生成）
       ],
       [
         '',
@@ -52,8 +52,8 @@ export async function GET(request: NextRequest) {
         '"渋谷駅"',
         'バス',
         'アクティブ',
-        '',
-        ''
+        '', // 作成日（インポート時は自動生成）
+        ''  // 更新日（インポート時は自動生成）
       ],
       [
         '',
@@ -68,8 +68,8 @@ export async function GET(request: NextRequest) {
         '"池袋駅"',
         '車',
         '非アクティブ',
-        '',
-        ''
+        '', // 作成日（インポート時は自動生成）
+        ''  // 更新日（インポート時は自動生成）
       ]
     ];
 

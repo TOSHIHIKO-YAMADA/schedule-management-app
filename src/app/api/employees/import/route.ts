@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       try {
         const fields = parseCSVLine(dataLines[i]);
         
-        if (fields.length < 12) {
+        if (fields.length < 11) { // IDフィールドは必須ではないため、11フィールド以上あればOK
           errors.push(`行 ${i + 2}: 必要なフィールドが不足しています`);
           continue;
         }
@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
           'INACTIVE': 'INACTIVE'
         };
 
+        // IDフィールドは自動生成するためスキップ（fields[0]は無視）
         const name = fields[1].replace(/^"(.+)"$/, '$1').trim();
         const nameKana = fields[2].replace(/^"(.+)"$/, '$1').trim();
         const email = fields[3].trim();
@@ -117,8 +118,10 @@ export async function POST(request: NextRequest) {
         const department = fields[7].replace(/^"(.+)"$/, '$1').trim();
         const position = fields[8].replace(/^"(.+)"$/, '$1').trim();
         const nearestStation = fields[9].replace(/^"(.+)"$/, '$1').trim();
-        const transportation = transportationMap[fields[10].trim()] || 'train';
-        const status = statusMap[fields[11].trim()] || 'ACTIVE';
+        
+        // フィールド数に応じて柔軟に対応
+        const transportation = fields.length > 10 ? (transportationMap[fields[10].trim()] || 'train') : 'train';
+        const status = fields.length > 11 ? (statusMap[fields[11].trim()] || 'ACTIVE') : 'ACTIVE';
 
         // バリデーション
         if (!name || !nameKana || !email || !department || !position || !nearestStation) {

@@ -256,17 +256,29 @@ export default function EmployeesPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-white border-2 border-blue-200 shadow-xl">
                 <DropdownMenuLabel className="text-gray-700 font-semibold">データ操作</DropdownMenuLabel>
-                <DropdownMenuItem onClick={handleImport} className="hover:bg-blue-50 cursor-pointer">
+                <DropdownMenuItem 
+                  onClick={handleImport} 
+                  className="hover:bg-blue-50 cursor-pointer"
+                  title="CSVファイルから従業員データを一括で取り込みます"
+                >
                   <Upload className="mr-2 h-4 w-4 text-blue-600" />
-                  <span>従業員をインポート</span>
+                  <span>インポート</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExport} className="hover:bg-blue-50 cursor-pointer">
+                <DropdownMenuItem 
+                  onClick={handleExport} 
+                  className="hover:bg-blue-50 cursor-pointer"
+                  title="現在の従業員データをCSVファイルで出力します"
+                >
                   <Download className="mr-2 h-4 w-4 text-blue-600" />
-                  <span>従業員リストをエクスポート</span>
+                  <span>エクスポート</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleDownloadSample} className="hover:bg-blue-50 cursor-pointer">
+                <DropdownMenuItem 
+                  onClick={handleDownloadSample} 
+                  className="hover:bg-blue-50 cursor-pointer"
+                  title="インポート用のサンプルCSVファイルをダウンロードします"
+                >
                   <FileText className="mr-2 h-4 w-4 text-blue-600" />
-                  <span>インポート用サンプルをダウンロード</span>
+                  <span>サンプル</span>
                 </DropdownMenuItem>
                 
                 <DropdownMenuSeparator className="bg-gray-200" />
