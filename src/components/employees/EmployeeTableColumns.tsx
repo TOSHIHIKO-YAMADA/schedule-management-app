@@ -9,12 +9,60 @@ import { Mail, Phone, Edit, Trash2 } from 'lucide-react';
 interface EmployeeTableColumnsProps {
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
+  selectedEmployeeIds: Set<string>;
+  onSelectEmployee: (employeeId: string, checked: boolean) => void;
+  onSelectAll: (checked: boolean) => void;
+  allEmployees: Employee[];
 }
 
 export const createEmployeeTableColumns = ({
   onEdit,
   onDelete,
+  selectedEmployeeIds,
+  onSelectEmployee,
+  onSelectAll,
+  allEmployees,
 }: EmployeeTableColumnsProps): ColumnDef<Employee>[] => [
+  {
+    id: 'select',
+    header: ({ table }) => {
+      const isAllSelected = allEmployees.length > 0 && 
+        allEmployees.every(emp => selectedEmployeeIds.has(emp.id));
+      const isIndeterminate = !isAllSelected && 
+        allEmployees.some(emp => selectedEmployeeIds.has(emp.id));
+
+      return (
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            checked={isAllSelected}
+            ref={(el) => {
+              if (el) el.indeterminate = isIndeterminate;
+            }}
+            onChange={(e) => onSelectAll(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      const employee = row.original;
+      const isSelected = selectedEmployeeIds.has(employee.id);
+
+      return (
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={(e) => onSelectEmployee(employee.id, e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+        </div>
+      );
+    },
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: 'name',
     header: '従業員名',

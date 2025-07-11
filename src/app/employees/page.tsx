@@ -22,6 +22,7 @@ export default function EmployeesPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Set<string>>(new Set());
 
   // APIからデータを取得
   const { data: employees = [], isLoading, error, refetch } = useQuery({
@@ -58,9 +59,33 @@ export default function EmployeesPage() {
     router.push('/employees/new');
   };
 
+  // 選択機能のハンドラー
+  const handleSelectEmployee = (employeeId: string, checked: boolean) => {
+    const newSelected = new Set(selectedEmployeeIds);
+    if (checked) {
+      newSelected.add(employeeId);
+    } else {
+      newSelected.delete(employeeId);
+    }
+    setSelectedEmployeeIds(newSelected);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(filteredEmployees.map((emp: Employee) => emp.id));
+      setSelectedEmployeeIds(allIds);
+    } else {
+      setSelectedEmployeeIds(new Set());
+    }
+  };
+
   const columns = createEmployeeTableColumns({
     onEdit: handleEdit,
     onDelete: handleDelete,
+    selectedEmployeeIds,
+    onSelectEmployee: handleSelectEmployee,
+    onSelectAll: handleSelectAll,
+    allEmployees: filteredEmployees,
   });
 
   if (isLoading) {
