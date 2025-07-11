@@ -205,25 +205,25 @@ export default function EmployeesPage() {
                 </div>
               </div>
               <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                <SelectTrigger className="bg-white/70 border-gray-200/60 focus:bg-white focus:border-blue-300">
-                  <SelectValue placeholder="部署で絞り込み" />
+                <SelectTrigger className="bg-gradient-to-r from-white to-blue-50 border-2 border-blue-200 shadow-md hover:border-blue-400 hover:shadow-lg transition-all duration-200 font-semibold text-blue-700">
+                  <SelectValue placeholder="所属で絞り込み" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">すべての部署</SelectItem>
-                  <SelectItem value="営業部">営業部</SelectItem>
-                  <SelectItem value="開発部">開発部</SelectItem>
-                  <SelectItem value="管理部">管理部</SelectItem>
-                  <SelectItem value="企画部">企画部</SelectItem>
+                <SelectContent className="bg-white border-2 border-blue-200 shadow-xl">
+                  <SelectItem value="all" className="hover:bg-blue-50 text-gray-700 font-medium">すべての所属</SelectItem>
+                  <SelectItem value="営業部" className="hover:bg-blue-50 text-gray-700 font-medium">営業部</SelectItem>
+                  <SelectItem value="開発部" className="hover:bg-blue-50 text-gray-700 font-medium">開発部</SelectItem>
+                  <SelectItem value="管理部" className="hover:bg-blue-50 text-gray-700 font-medium">管理部</SelectItem>
+                  <SelectItem value="企画部" className="hover:bg-blue-50 text-gray-700 font-medium">企画部</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="bg-white/70 border-gray-200/60 focus:bg-white focus:border-blue-300">
+                <SelectTrigger className="bg-gradient-to-r from-white to-blue-50 border-2 border-blue-200 shadow-md hover:border-blue-400 hover:shadow-lg transition-all duration-200 font-semibold text-blue-700">
                   <SelectValue placeholder="ステータスで絞り込み" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">すべてのステータス</SelectItem>
-                  <SelectItem value="ACTIVE">アクティブ</SelectItem>
-                  <SelectItem value="INACTIVE">非アクティブ</SelectItem>
+                <SelectContent className="bg-white border-2 border-blue-200 shadow-xl">
+                  <SelectItem value="all" className="hover:bg-blue-50 text-gray-700 font-medium">すべてのステータス</SelectItem>
+                  <SelectItem value="ACTIVE" className="hover:bg-blue-50 text-gray-700 font-medium">アクティブ</SelectItem>
+                  <SelectItem value="INACTIVE" className="hover:bg-blue-50 text-gray-700 font-medium">非アクティブ</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -330,10 +330,6 @@ export default function EmployeesPage() {
               >
                 最後
               </Button>
-              
-              <div className="text-sm font-medium text-gray-600 ml-3 px-3 py-1 bg-white rounded-md border border-gray-200">
-                {totalPages > 0 ? `${currentPage} / ${totalPages}ページ` : '0 / 0ページ'}
-              </div>
             </div>
           </div>
           </div>
