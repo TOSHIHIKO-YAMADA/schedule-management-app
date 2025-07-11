@@ -3,12 +3,20 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Search, Trash2 } from 'lucide-react';
+import { Plus, Search, Trash2, MoreHorizontal, Upload, Download, FileText, TestTube } from 'lucide-react';
 import { Employee } from '@prisma/client';
 import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { DeleteEmployeeDialog } from '@/components/employees/DeleteEmployeeDialog';
@@ -105,6 +113,19 @@ export default function EmployeesPage() {
     }
   };
 
+  // 新しい機能のプレースホルダー関数
+  const handleImport = () => {
+    alert('インポート機能は実装予定です');
+  };
+
+  const handleExport = () => {
+    alert('エクスポート機能は実装予定です');
+  };
+
+  const handleDownloadSample = () => {
+    alert('サンプルダウンロード機能は実装予定です');
+  };
+
   // 選択機能のハンドラー
   const handleSelectEmployee = (employeeId: string, checked: boolean) => {
     const newSelected = new Set(selectedEmployeeIds);
@@ -162,28 +183,58 @@ export default function EmployeesPage() {
               従業員の情報を管理・編集できます
             </p>
           </div>
-          <div className="flex gap-3">
-            <Button 
-              onClick={handleClearData}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              全データ削除
-            </Button>
-            <Button 
-              onClick={handleSeedData}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              ダミーデータ100件作成
-            </Button>
+          <div className="flex items-center gap-3">
+            {/* メインアクション：新規従業員追加 */}
             <Button 
               onClick={handleNewEmployee}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
             >
               <Plus className="h-4 w-4" />
               新規従業員追加
             </Button>
+            
+            {/* その他のアクション */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="bg-white/80 border-2 border-blue-200 hover:bg-blue-50 hover:border-blue-400 shadow-md hover:shadow-lg transition-all duration-200"
+                >
+                  <MoreHorizontal className="h-4 w-4 mr-2" />
+                  その他の操作
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-white border-2 border-blue-200 shadow-xl">
+                <DropdownMenuLabel className="text-gray-700 font-semibold">データ操作</DropdownMenuLabel>
+                <DropdownMenuItem onClick={handleImport} className="hover:bg-blue-50 cursor-pointer">
+                  <Upload className="mr-2 h-4 w-4 text-blue-600" />
+                  <span>従業員をインポート</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExport} className="hover:bg-blue-50 cursor-pointer">
+                  <Download className="mr-2 h-4 w-4 text-blue-600" />
+                  <span>従業員リストをエクスポート</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDownloadSample} className="hover:bg-blue-50 cursor-pointer">
+                  <FileText className="mr-2 h-4 w-4 text-blue-600" />
+                  <span>インポート用サンプルをダウンロード</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator className="bg-gray-200" />
+                
+                <DropdownMenuLabel className="text-gray-700 font-semibold">開発用</DropdownMenuLabel>
+                <DropdownMenuItem onClick={handleSeedData} className="hover:bg-green-50 cursor-pointer">
+                  <TestTube className="mr-2 h-4 w-4 text-green-600" />
+                  <span>ダミーデータを100件作成</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={handleClearData} 
+                  className="text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  <span>全データ削除</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
