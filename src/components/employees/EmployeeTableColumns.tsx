@@ -4,15 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Employee } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Mail, Phone, Edit, Trash2 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Mail, Phone, Edit, Trash2 } from 'lucide-react';
 
 interface EmployeeTableColumnsProps {
   onEdit: (employee: Employee) => void;
@@ -85,32 +77,26 @@ export const createEmployeeTableColumns = ({
       const employee = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              className="h-8 w-8 p-0 hover:bg-gray-100 border border-gray-200 rounded"
-            >
-              <span className="sr-only">メニューを開く</span>
-              <MoreHorizontal className="h-4 w-4 text-gray-600" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>アクション</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onEdit(employee)}>
-              <Edit className="mr-2 h-4 w-4" />
-              編集
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="text-destructive"
-              onClick={() => onDelete(employee)}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              削除
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex gap-2 justify-end">
+          <Button
+            onClick={() => onEdit(employee)}
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <Edit className="h-3 w-3 mr-1" />
+            編集
+          </Button>
+          <Button
+            onClick={() => onDelete(employee)}
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 text-red-600 border-red-200 hover:bg-red-50"
+          >
+            <Trash2 className="h-3 w-3 mr-1" />
+            削除
+          </Button>
+        </div>
       );
     },
   },
