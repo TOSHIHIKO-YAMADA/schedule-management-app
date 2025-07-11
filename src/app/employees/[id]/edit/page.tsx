@@ -4,8 +4,8 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { EmployeeForm } from "@/components/employees/EmployeeForm";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { ApiErrorAlert } from "@/components/common/ApiErrorAlert";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { ApiErrorAlert } from "@/components/ui/ApiErrorAlert";
 import { apiClient } from "@/lib/api-client";
 
 interface EditEmployeePageProps {
