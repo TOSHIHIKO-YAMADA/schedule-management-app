@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Trash2 } from 'lucide-react';
 import { Employee } from '@prisma/client';
 import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/button';
@@ -70,6 +70,19 @@ export default function EmployeesPage() {
     }
   };
 
+  const handleClearData = async () => {
+    if (confirm('全ての従業員データを削除しますか？この操作は元に戻せません。')) {
+      try {
+        const response = await apiClient.delete('/employees/clear');
+        alert(`${response.data.count}件のデータを削除しました`);
+        refetch(); // データを再取得
+      } catch (error) {
+        alert('データの削除に失敗しました');
+        console.error('Clear data failed:', error);
+      }
+    }
+  };
+
   // 選択機能のハンドラー
   const handleSelectEmployee = (employeeId: string, checked: boolean) => {
     const newSelected = new Set(selectedEmployeeIds);
@@ -127,6 +140,13 @@ export default function EmployeesPage() {
             </p>
           </div>
           <div className="flex gap-3">
+            <Button 
+              onClick={handleClearData}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              全データ削除
+            </Button>
             <Button 
               onClick={handleSeedData}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
