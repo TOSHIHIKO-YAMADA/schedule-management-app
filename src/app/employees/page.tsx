@@ -59,6 +59,17 @@ export default function EmployeesPage() {
     router.push('/employees/new');
   };
 
+  const handleSeedData = async () => {
+    try {
+      const response = await apiClient.post('/employees/seed');
+      alert(`${response.data.count}件のダミーデータを作成しました`);
+      refetch(); // データを再取得
+    } catch (error) {
+      alert('ダミーデータの作成に失敗しました');
+      console.error('Seed data creation failed:', error);
+    }
+  };
+
   // 選択機能のハンドラー
   const handleSelectEmployee = (employeeId: string, checked: boolean) => {
     const newSelected = new Set(selectedEmployeeIds);
@@ -115,13 +126,22 @@ export default function EmployeesPage() {
               従業員の情報を管理・編集できます
             </p>
           </div>
-          <Button 
-            onClick={handleNewEmployee}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            新規従業員追加
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={handleSeedData}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              ダミーデータ100件作成
+            </Button>
+            <Button 
+              onClick={handleNewEmployee}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              新規従業員追加
+            </Button>
+          </div>
         </div>
 
         {/* フィルター */}
