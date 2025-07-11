@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Calendar, Clock, CheckCircle, AlertCircle, TrendingUp, Users, Bell, Plus, Car, Building2 } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { todaySchedules, upcomingTasks, stats, recentActivities, employees, customers, vehicles, categorySettings, prioritySettings } from "@/lib/mockData";
 import { Schedule, Task, ActivityLog } from "@/lib/types";
 import { WeeklyScheduleChart } from "@/components/dashboard/WeeklyScheduleChart";
@@ -59,21 +60,18 @@ export default function DashboardPage() {
                 </p>
               </div>
               <div className="flex space-x-3">
-                <InteractiveButton
-                  variant="secondary"
-                  className="bg-white text-gray-700 border border-gray-300 shadow-sm hover:bg-gray-50"
+                <Button
+                  variant="outline"
+                  className="bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
                 >
                   <Bell className="w-4 h-4 mr-2" />
                   通知設定
-                </InteractiveButton>
+                </Button>
                 <Link href="/schedules/new">
-                  <InteractiveButton 
-                    variant="primary"
-                    className="bg-blue-600 text-white hover:bg-blue-700"
-                  >
+                  <Button className="bg-blue-600 text-white hover:bg-blue-700">
                     <Plus className="w-4 h-4 mr-2" />
                     新規作成
-                  </InteractiveButton>
+                  </Button>
                 </Link>
               </div>
             </div>
