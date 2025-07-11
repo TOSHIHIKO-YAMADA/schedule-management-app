@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -45,13 +45,15 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
 
   const form = useForm<UpdateEmployeeFormData>({
     resolver: zodResolver(updateEmployeeSchema),
-    defaultValues: employee || {},
+    defaultValues: {},
   });
 
   // フォームのデフォルト値を更新
-  if (employee && !form.formState.isDirty) {
-    form.reset(employee);
-  }
+  useEffect(() => {
+    if (employee) {
+      form.reset(employee);
+    }
+  }, [employee, form]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateEmployeeFormData) => {
