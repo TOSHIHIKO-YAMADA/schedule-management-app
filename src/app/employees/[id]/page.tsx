@@ -3,7 +3,7 @@
 import { useState, use } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Edit, User, Eye } from 'lucide-react';
+import { ArrowLeft, Edit, User, FileText } from 'lucide-react';
 import { useAuthorization } from '@/hooks/useAuthorization';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -114,7 +114,7 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                 {isEditing ? (
                   <Edit className="w-8 h-8 text-white" />
                 ) : (
-                  <Eye className="w-8 h-8 text-white" />
+                  <FileText className="w-8 h-8 text-white" />
                 )}
               </div>
               
