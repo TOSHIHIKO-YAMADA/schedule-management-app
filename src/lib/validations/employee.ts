@@ -22,9 +22,6 @@ export const createEmployeeSchema = z.object({
   department: z.string()
     .min(1, "所属は必須です")
     .max(100, "所属は100文字以内で入力してください"),
-  position: z.string()
-    .max(100, "役職は100文字以内で入力してください")
-    .optional(),
   nearestStation: z.string()
     .min(1, "最寄り駅は必須です")
     .max(100, "最寄り駅は100文字以内で入力してください"),
