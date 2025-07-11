@@ -2,6 +2,7 @@
 
 import { Calendar, Clock, CheckCircle, ArrowRight, Sparkles, Users, Car } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { PageTransition, StaggerContainer, StaggerItem, FadeIn, SlideIn } from "@/components/animations/PageTransition";
 import { InteractiveCard, InteractiveButton } from "@/components/animations/InteractiveCard";
 
@@ -38,24 +39,23 @@ export default function Home() {
               <FadeIn delay={0.4}>
                 <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
                   <Link href="/dashboard">
-                    <InteractiveButton 
-                      variant="primary" 
+                    <Button 
                       size="lg"
-                      className="group shadow-colored hover:shadow-large"
+                      className="group bg-blue-600 text-white hover:bg-blue-700 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       今すぐ始める
                       <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                    </InteractiveButton>
+                    </Button>
                   </Link>
                   
                   <Link href="/schedules">
-                    <InteractiveButton 
-                      variant="secondary" 
+                    <Button 
+                      variant="outline"
                       size="lg"
-                      className="border-2 border-primary/20 hover:border-primary/40 shadow-soft hover:shadow-medium"
+                      className="bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       スケジュール確認
-                    </InteractiveButton>
+                    </Button>
                   </Link>
                 </div>
               </FadeIn>
