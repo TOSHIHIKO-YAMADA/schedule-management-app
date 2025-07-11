@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -21,9 +21,9 @@ import { z } from 'zod';
 type UpdateEmployeeFormData = z.infer<typeof updateEmployeeSchema>;
 
 interface EmployeeDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) {
@@ -31,11 +31,14 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
   const queryClient = useQueryClient();
   const { canEdit } = useAuthorization();
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Next.js 15でparamsはPromiseになったため、use()でアンラップ
+  const { id } = use(params);
 
   const { data: employee, isLoading, error } = useQuery({
-    queryKey: ['employee', params.id],
+    queryKey: ['employee', id],
     queryFn: async () => {
-      const response = await apiClient.get(`/employees/${params.id}`);
+      const response = await apiClient.get(`/employees/${id}`);
       return response.data as Employee;
     },
   });
@@ -52,11 +55,11 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
 
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateEmployeeFormData) => {
-      const response = await apiClient.put(`/employees/${params.id}`, data);
+      const response = await apiClient.put(`/employees/${id}`, data);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['employee', params.id] });
+      queryClient.invalidateQueries({ queryKey: ['employee', id] });
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       setIsEditing(false);
       alert('従業員情報を更新しました');
