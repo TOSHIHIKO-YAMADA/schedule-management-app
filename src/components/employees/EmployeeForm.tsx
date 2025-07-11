@@ -62,7 +62,7 @@ export function EmployeeForm({ employee, onSuccess, onCancel }: EmployeeFormProp
 
   const createMutation = useMutation({
     mutationFn: async (data: CreateEmployeeInput) => {
-      const response = await apiClient.post('/api/employees', data);
+      const response = await apiClient.post('/employees', data);
       return response.data;
     },
     onSuccess: () => {
@@ -74,7 +74,7 @@ export function EmployeeForm({ employee, onSuccess, onCancel }: EmployeeFormProp
 
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateEmployeeInput) => {
-      const response = await apiClient.put(`/api/employees/${employee!.id}`, data);
+      const response = await apiClient.put(`/employees/${employee!.id}`, data);
       return response.data;
     },
     onSuccess: () => {

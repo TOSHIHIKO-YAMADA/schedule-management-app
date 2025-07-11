@@ -27,7 +27,7 @@ export default function EmployeesPage() {
   const { data: employees = [], isLoading, error, refetch } = useQuery({
     queryKey: ['employees'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/employees');
+      const response = await apiClient.get('/employees');
       return response.data;
     },
   });

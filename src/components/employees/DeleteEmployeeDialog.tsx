@@ -31,7 +31,7 @@ export function DeleteEmployeeDialog({
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      await apiClient.delete(`/api/employees/${employee.id}`);
+      await apiClient.delete(`/employees/${employee.id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employees'] });

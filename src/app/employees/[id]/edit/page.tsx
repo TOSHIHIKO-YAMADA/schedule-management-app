@@ -21,7 +21,7 @@ export default function EditEmployeePage({ params }: EditEmployeePageProps) {
   const { data: employee, isLoading, error } = useQuery({
     queryKey: ['employee', id],
     queryFn: async () => {
-      const response = await apiClient.get(`/api/employees/${id}`);
+      const response = await apiClient.get(`/employees/${id}`);
       return response.data;
     },
   });
