@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       [
         '', // ID（インポート時は自動生成されるため空でOK）
         '"田中太郎"',
-        '"タナカタロウ"',
+        '"たなかたろう"',
         'tanaka.taro@example.com',
         '090-1234-5678',
         'tanaka_line123',
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       [
         '',
         '"佐藤花子"',
-        '"サトウハナコ"',
+        '"さとうはなこ"',
         'sato.hanako@example.com',
         '080-9876-5432',
         '',
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       [
         '',
         '"山田次郎"',
-        '"ヤマダジロウ"',
+        '"やまだじろう"',
         'yamada.jiro@example.com',
         '070-1111-2222',
         'yamada_line456',

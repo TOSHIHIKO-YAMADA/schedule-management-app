@@ -3,29 +3,29 @@ import { prisma } from '@/lib/prisma';
 
 // ダミーデータ生成用の配列
 const firstNames = [
-  { name: '太郎', kana: 'タロウ' }, { name: '花子', kana: 'ハナコ' }, { name: '次郎', kana: 'ジロウ' },
-  { name: '美咲', kana: 'ミサキ' }, { name: '三郎', kana: 'サブロウ' }, { name: '愛子', kana: 'アイコ' },
-  { name: '健太', kana: 'ケンタ' }, { name: '由美', kana: 'ユミ' }, { name: '大輔', kana: 'ダイスケ' },
-  { name: '真理', kana: 'マリ' }, { name: '優介', kana: 'ユウスケ' }, { name: '恵子', kana: 'ケイコ' },
-  { name: '浩二', kana: 'コウジ' }, { name: '智子', kana: 'トモコ' }, { name: '和也', kana: 'カズヤ' },
-  { name: '麻衣', kana: 'マイ' }, { name: '拓也', kana: 'タクヤ' }, { name: '綾子', kana: 'アヤコ' },
-  { name: '俊介', kana: 'シュンスケ' }, { name: '香織', kana: 'カオリ' }, { name: '直人', kana: 'ナオト' },
-  { name: '裕子', kana: 'ユウコ' }, { name: '雅人', kana: 'マサト' }, { name: '京子', kana: 'キョウコ' },
-  { name: '翔太', kana: 'ショウタ' }, { name: '奈美', kana: 'ナミ' }, { name: '慎一', kana: 'シンイチ' },
-  { name: '美穂', kana: 'ミホ' }, { name: '達也', kana: 'タツヤ' }, { name: '佳子', kana: 'ヨシコ' }
+  { name: '太郎', kana: 'たろう' }, { name: '花子', kana: 'はなこ' }, { name: '次郎', kana: 'じろう' },
+  { name: '美咲', kana: 'みさき' }, { name: '三郎', kana: 'さぶろう' }, { name: '愛子', kana: 'あいこ' },
+  { name: '健太', kana: 'けんた' }, { name: '由美', kana: 'ゆみ' }, { name: '大輔', kana: 'だいすけ' },
+  { name: '真理', kana: 'まり' }, { name: '優介', kana: 'ゆうすけ' }, { name: '恵子', kana: 'けいこ' },
+  { name: '浩二', kana: 'こうじ' }, { name: '智子', kana: 'ともこ' }, { name: '和也', kana: 'かずや' },
+  { name: '麻衣', kana: 'まい' }, { name: '拓也', kana: 'たくや' }, { name: '綾子', kana: 'あやこ' },
+  { name: '俊介', kana: 'しゅんすけ' }, { name: '香織', kana: 'かおり' }, { name: '直人', kana: 'なおと' },
+  { name: '裕子', kana: 'ゆうこ' }, { name: '雅人', kana: 'まさと' }, { name: '京子', kana: 'きょうこ' },
+  { name: '翔太', kana: 'しょうた' }, { name: '奈美', kana: 'なみ' }, { name: '慎一', kana: 'しんいち' },
+  { name: '美穂', kana: 'みほ' }, { name: '達也', kana: 'たつや' }, { name: '佳子', kana: 'よしこ' }
 ];
 
 const lastNames = [
-  { name: '田中', kana: 'タナカ' }, { name: '山田', kana: 'ヤマダ' }, { name: '佐藤', kana: 'サトウ' },
-  { name: '中村', kana: 'ナカムラ' }, { name: '小林', kana: 'コバヤシ' }, { name: '加藤', kana: 'カトウ' },
-  { name: '吉田', kana: 'ヨシダ' }, { name: '山本', kana: 'ヤマモト' }, { name: '佐々木', kana: 'ササキ' },
-  { name: '高橋', kana: 'タカハシ' }, { name: '渡辺', kana: 'ワタナベ' }, { name: '伊藤', kana: 'イトウ' },
-  { name: '中島', kana: 'ナカジマ' }, { name: '小川', kana: 'オガワ' }, { name: '岡田', kana: 'オカダ' },
-  { name: '近藤', kana: 'コンドウ' }, { name: '水野', kana: 'ミズノ' }, { name: '安田', kana: 'ヤスダ' },
-  { name: '藤田', kana: 'フジタ' }, { name: '松本', kana: 'マツモト' }, { name: '前田', kana: 'マエダ' },
-  { name: '岩田', kana: 'イワタ' }, { name: '竹内', kana: 'タケウチ' }, { name: '森田', kana: 'モリタ' },
-  { name: '清水', kana: 'シミズ' }, { name: '石川', kana: 'イシカワ' }, { name: '池田', kana: 'イケダ' },
-  { name: '橋本', kana: 'ハシモト' }, { name: '山口', kana: 'ヤマグチ' }, { name: '木村', kana: 'キムラ' }
+  { name: '田中', kana: 'たなか' }, { name: '山田', kana: 'やまだ' }, { name: '佐藤', kana: 'さとう' },
+  { name: '中村', kana: 'なかむら' }, { name: '小林', kana: 'こばやし' }, { name: '加藤', kana: 'かとう' },
+  { name: '吉田', kana: 'よしだ' }, { name: '山本', kana: 'やまもと' }, { name: '佐々木', kana: 'ささき' },
+  { name: '高橋', kana: 'たかはし' }, { name: '渡辺', kana: 'わたなべ' }, { name: '伊藤', kana: 'いとう' },
+  { name: '中島', kana: 'なかじま' }, { name: '小川', kana: 'おがわ' }, { name: '岡田', kana: 'おかだ' },
+  { name: '近藤', kana: 'こんどう' }, { name: '水野', kana: 'みずの' }, { name: '安田', kana: 'やすだ' },
+  { name: '藤田', kana: 'ふじた' }, { name: '松本', kana: 'まつもと' }, { name: '前田', kana: 'まえだ' },
+  { name: '岩田', kana: 'いわた' }, { name: '竹内', kana: 'たけうち' }, { name: '森田', kana: 'もりた' },
+  { name: '清水', kana: 'しみず' }, { name: '石川', kana: 'いしかわ' }, { name: '池田', kana: 'いけだ' },
+  { name: '橋本', kana: 'はしもと' }, { name: '山口', kana: 'やまぐち' }, { name: '木村', kana: 'きむら' }
 ];
 
 const departments = [
@@ -74,6 +74,32 @@ function generateLineId(): string | null {
   return `${prefix}_${suffix}`;
 }
 
+// 日本語名をローマ字に変換する関数
+function toRomaji(kana: string): string {
+  const kanaToRomaji: Record<string, string> = {
+    'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
+    'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
+    'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
+    'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
+    'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
+    'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
+    'だ': 'da', 'ぢ': 'di', 'づ': 'du', 'で': 'de', 'ど': 'do',
+    'な': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
+    'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
+    'ば': 'ba', 'び': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
+    'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
+    'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
+    'や': 'ya', 'ゆ': 'yu', 'よ': 'yo',
+    'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
+    'わ': 'wa', 'ゐ': 'wi', 'ゑ': 'we', 'を': 'wo', 'ん': 'n',
+    'ー': '', // 長音記号は無視
+    'っ': '', // 促音は無視（簡略化）
+    'ゃ': 'ya', 'ゅ': 'yu', 'ょ': 'yo'
+  };
+
+  return kana.split('').map(char => kanaToRomaji[char] || char).join('');
+}
+
 // POST /api/employees/seed - 100件のダミーデータを生成
 export async function POST(request: NextRequest) {
   try {
@@ -84,7 +110,11 @@ export async function POST(request: NextRequest) {
       const firstName = getRandomElement(firstNames);
       const name = `${lastName.name}${firstName.name}`;
       const nameKana = `${lastName.kana}${firstName.kana}`;
-      const email = `${lastName.name.toLowerCase()}${firstName.name.toLowerCase()}${i}@example.com`;
+      
+      // ローマ字変換してメールアドレス作成
+      const lastNameRomaji = toRomaji(lastName.kana);
+      const firstNameRomaji = toRomaji(firstName.kana);
+      const email = `${lastNameRomaji}.${firstNameRomaji}${i}@example.com`;
       const phone = generatePhoneNumber();
       const lineId = generateLineId();
       const notificationMethod = getRandomElement(notificationMethods);
