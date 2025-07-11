@@ -225,12 +225,12 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                               value={form.watch('status')}
                               onValueChange={(value) => form.setValue('status', value, { shouldDirty: true })}
                             >
-                              <SelectTrigger className="mt-1">
+                              <SelectTrigger className="mt-1 bg-white border-2 border-gray-300 hover:border-blue-400 focus:border-blue-500 shadow-sm">
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="ACTIVE">アクティブ</SelectItem>
-                                <SelectItem value="INACTIVE">非アクティブ</SelectItem>
+                              <SelectContent className="bg-white border-2 border-gray-300 shadow-xl">
+                                <SelectItem value="ACTIVE" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">アクティブ</SelectItem>
+                                <SelectItem value="INACTIVE" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">非アクティブ</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -365,13 +365,13 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                             value={form.watch('notificationMethod')}
                             onValueChange={(value) => form.setValue('notificationMethod', value, { shouldDirty: true })}
                           >
-                            <SelectTrigger className="mt-1">
+                            <SelectTrigger className="mt-1 bg-white border-2 border-gray-300 hover:border-blue-400 focus:border-blue-500 shadow-sm">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="email">メール</SelectItem>
-                              <SelectItem value="line">LINE</SelectItem>
-                              <SelectItem value="both">メール・LINE</SelectItem>
+                            <SelectContent className="bg-white border-2 border-gray-300 shadow-xl">
+                              <SelectItem value="email" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">メール</SelectItem>
+                              <SelectItem value="line" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">LINE</SelectItem>
+                              <SelectItem value="both" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">メール・LINE</SelectItem>
                             </SelectContent>
                           </Select>
                           {form.formState.errors.notificationMethod && (
@@ -432,15 +432,15 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
                             value={form.watch('transportation')}
                             onValueChange={(value) => form.setValue('transportation', value, { shouldDirty: true })}
                           >
-                            <SelectTrigger className="mt-1">
+                            <SelectTrigger className="mt-1 bg-white border-2 border-gray-300 hover:border-blue-400 focus:border-blue-500 shadow-sm">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="train">電車</SelectItem>
-                              <SelectItem value="car">車</SelectItem>
-                              <SelectItem value="bicycle">自転車</SelectItem>
-                              <SelectItem value="walk">徒歩</SelectItem>
-                              <SelectItem value="bus">バス</SelectItem>
+                            <SelectContent className="bg-white border-2 border-gray-300 shadow-xl">
+                              <SelectItem value="train" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">電車</SelectItem>
+                              <SelectItem value="car" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">車</SelectItem>
+                              <SelectItem value="bicycle" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">自転車</SelectItem>
+                              <SelectItem value="walk" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">徒歩</SelectItem>
+                              <SelectItem value="bus" className="hover:bg-blue-50 focus:bg-blue-100 cursor-pointer">バス</SelectItem>
                             </SelectContent>
                           </Select>
                           {form.formState.errors.transportation && (
