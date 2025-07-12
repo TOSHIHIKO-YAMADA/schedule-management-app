@@ -148,6 +148,9 @@ model Schedule {
   // 通知設定
   reminderMinutes Int?  // 何分前に通知するか
   
+  // 確定状態
+  isConfirmed Boolean @default(false) // 予定が確定されているか
+  
   createdBy   String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

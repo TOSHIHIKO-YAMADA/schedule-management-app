@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-// 資機材の定義
+// 装備品の定義（仕様に準拠）
 export const equipmentOptions = [
-  { id: 'boots', label: '長靴', icon: '🔺' },
-  { id: 'workPants', label: '作業スボン', icon: '📷' },
-  { id: 'blueGloves', label: '青手', icon: '🏷️' },
-  { id: 'cutter', label: 'カッター', icon: '⚠️' },
-  { id: 'jacket', label: '上着', icon: '👤' },
+  { id: 'longSleeve', label: '長袖', icon: '👔' },
+  { id: 'workPants', label: '作業ズボン', icon: '👖' },
+  { id: 'gloves', label: '軍手', icon: '🧤' },
+  { id: 'cutter', label: 'カッター', icon: '🔪' },
+  { id: 'indoorShoes', label: '上履き', icon: '👟' },
   { id: 'helmet', label: 'ヘルメット', icon: '⛑️' },
 ] as const;
 
@@ -37,15 +37,18 @@ export const fieldworkScheduleSchema = z.object({
   date: z.string().min(1, '日付を選択してください'),
   siteName: z.string().min(1, '現場名を入力してください'),
   address: z.string().min(1, '住所を入力してください'),
+  customerId: z.string().min(1, '顧客を選択してください'),
   
   // 責任者
   responsibleId: z.string().min(1, '責任者を選択してください'),
   
-  // 資機材
+  // 装備品
   equipment: z.array(z.string()).default([]),
   
-  // 時間帯（動的配列）
-  timeSlots: z.array(timeSlotSchema).min(1, '少なくとも1つの時間帯を追加してください'),
+  // 時間帯（動的配列）- 最大10件
+  timeSlots: z.array(timeSlotSchema)
+    .min(1, '少なくとも1つの時間帯を追加してください')
+    .max(10, '時間帯は最大10件まで追加できます'),
   
   // 担当者割り当て
   assignments: z.array(assignmentSchema).default([]),
@@ -62,6 +65,7 @@ export const fieldworkScheduleSchema = z.object({
   // その他
   notes: z.string().optional(),
   canDuplicate: z.boolean().default(false),
+  isConfirmed: z.boolean().default(false), // 確定状態
 });
 
 export type FieldworkScheduleFormData = z.infer<typeof fieldworkScheduleSchema>;
