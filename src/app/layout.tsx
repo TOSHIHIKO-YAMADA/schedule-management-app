@@ -6,6 +6,7 @@ import { ColoredTopLoader } from "@/components/layout/ColoredTopLoader";
 import Navigation from "@/components/layout/Navigation";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ScheduleTemplateProvider } from "@/contexts/ScheduleTemplateContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -45,11 +46,13 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <TooltipProvider>
-                {/* 統一されたローディングバー */}
-                <ColoredTopLoader />
-                {/* ナビゲーション */}
-                <Navigation />
-                {children}
+                <ScheduleTemplateProvider>
+                  {/* 統一されたローディングバー */}
+                  <ColoredTopLoader />
+                  {/* ナビゲーション */}
+                  <Navigation />
+                  {children}
+                </ScheduleTemplateProvider>
               </TooltipProvider>
             </ThemeProvider>
           </QueryProvider>

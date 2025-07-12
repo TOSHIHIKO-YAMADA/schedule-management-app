@@ -326,14 +326,48 @@ export function FieldworkScheduleForm({
             <Label className="text-sm font-medium text-gray-700">
               責任者 <span className="text-red-500">*</span>
             </Label>
-            <div className="mt-1 relative">
-              <Input
-                placeholder="責任者を入力または検索..."
-                value={responsibleSearch}
-                onChange={(e) => setResponsibleSearch(e.target.value)}
-                className="pr-10"
-              />
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <div className="mt-1 space-y-3">
+              <div className="relative">
+                <Input
+                  placeholder="責任者を検索..."
+                  value={responsibleSearch}
+                  onChange={(e) => setResponsibleSearch(e.target.value)}
+                  className="pr-10"
+                />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+              
+              {responsibleSearch && (
+                <div className="border rounded-lg max-h-32 overflow-y-auto">
+                  {employees
+                    .filter((employee: any) => 
+                      employee.name.toLowerCase().includes(responsibleSearch.toLowerCase()) ||
+                      employee.department.toLowerCase().includes(responsibleSearch.toLowerCase())
+                    )
+                    .map((employee: any) => (
+                      <button
+                        key={employee.id}
+                        type="button"
+                        className="w-full text-left p-2 hover:bg-gray-50 border-b last:border-b-0"
+                        onClick={() => {
+                          setValue('responsibleId', employee.id);
+                          setResponsibleSearch(`${employee.name} (${employee.department})`);
+                        }}
+                      >
+                        <div className="font-medium">{employee.name}</div>
+                        <div className="text-sm text-gray-600">{employee.department} - {employee.position}</div>
+                      </button>
+                    ))}
+                  {employees.filter((employee: any) => 
+                    employee.name.toLowerCase().includes(responsibleSearch.toLowerCase()) ||
+                    employee.department.toLowerCase().includes(responsibleSearch.toLowerCase())
+                  ).length === 0 && (
+                    <div className="p-2 text-sm text-gray-500 text-center">
+                      該当する従業員が見つかりません
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             {errors.responsibleId && (
               <p className="mt-1 text-sm text-red-600">{errors.responsibleId.message}</p>

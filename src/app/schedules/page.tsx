@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Search, Calendar as CalendarIcon, List, Filter, MoreHorizontal } from 'lucide-react';
+import { Plus, Search, Calendar as CalendarIcon, List, Filter, MoreHorizontal, Copy, Clipboard } from 'lucide-react';
+import { useScheduleTemplate } from '@/contexts/ScheduleTemplateContext';
 import { ScheduleCalendar } from '@/components/schedules/ScheduleCalendar';
 import { FieldworkScheduleForm } from '@/components/schedules/FieldworkScheduleForm';
+import { BulkImportDialog } from '@/components/schedules/BulkImportDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -76,12 +78,14 @@ interface ScheduleWithDetails {
 
 export default function SchedulesPage() {
   const router = useRouter();
+  const { template, copyScheduleTemplate, clearTemplate, hasTemplate } = useScheduleTemplate();
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showBulkImport, setShowBulkImport] = useState(false);
 
   // APIからスケジュールデータを取得
   const { data: schedules = [], isLoading, error, refetch } = useQuery({
@@ -156,6 +160,73 @@ export default function SchedulesPage() {
     return acc;
   }, {} as Record<string, number>);
 
+  // テンプレート関連の関数
+  const handleCopySchedule = async (scheduleId: string) => {
+    try {
+      const response = await apiClient.get(`/schedules/${scheduleId}`);
+      const scheduleData = response.data.data;
+      
+      // テンプレートデータに変換
+      const templateData = {
+        siteName: scheduleData.siteName,
+        address: scheduleData.address,
+        customerId: scheduleData.customerId,
+        responsibleId: scheduleData.responsibleId,
+        equipment: scheduleData.equipment || [],
+        timeSlots: scheduleData.timeSlots?.map((slot: any) => ({
+          startTime: slot.startTime.split('T')[1]?.substring(0, 5) || '09:00',
+          endTime: slot.endTime.split('T')[1]?.substring(0, 5) || '17:00',
+          requiredPersons: slot.requiredPersons,
+        })) || [],
+        meetingCategory: scheduleData.meetingCategory,
+        meetingPoint: scheduleData.meetingPoint,
+        notes: scheduleData.description,
+      };
+
+      copyScheduleTemplate(templateData, scheduleId);
+    } catch (error) {
+      console.error('スケジュールコピーエラー:', error);
+    }
+  };
+
+  const handlePasteTemplate = () => {
+    if (template) {
+      setShowAddForm(true);
+    }
+  };
+
+  const handleBulkImport = async (importData: any[]) => {
+    try {
+      // 一括インポート処理
+      for (const item of importData) {
+        const scheduleData = {
+          title: item.siteName,
+          type: 'fieldwork' as const,
+          siteName: item.siteName,
+          address: item.address,
+          customerId: item.customer, // TODO: 顧客名から顧客IDに変換
+          timeSlots: [{
+            startTime: new Date(`${item.date}T${item.startTime}`).toISOString(),
+            endTime: new Date(`${item.date}T${item.endTime}`).toISOString(),
+            requiredPersons: item.requiredPersons,
+          }],
+          startTime: new Date(`${item.date}T${item.startTime}`).toISOString(),
+          endTime: new Date(`${item.date}T${item.endTime}`).toISOString(),
+          employeeId: 'current-user-id', // TODO: 実際のユーザーID
+          description: item.notes,
+          isConfirmed: item.isConfirmed,
+        };
+
+        await apiClient.post('/schedules', scheduleData);
+      }
+      
+      refetch();
+      setShowBulkImport(false);
+    } catch (error) {
+      console.error('一括インポートエラー:', error);
+    }
+  };
+
   const renderListView = () => {
     if (schedules.length === 0) {
       return (
@@ -214,6 +285,21 @@ export default function SchedulesPage() {
                       <p>👥 担当者: {schedule.assignments.map(a => a.employee.name).join(', ')}</p>
                     )}
                   </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopySchedule(schedule.id);
+                    }}
+                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                  >
+                    <Copy className="h-4 w-4 mr-1" />
+                    コピー
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -286,6 +372,28 @@ export default function SchedulesPage() {
                   新規登録
                 </Button>
                 
+                {hasTemplate && (
+                  <Button
+                    onClick={handlePasteTemplate}
+                    variant="outline"
+                    className="bg-white/50 backdrop-blur-sm border-green-300 hover:bg-green-50 text-green-700 px-4 py-3 rounded-xl shadow-sm"
+                  >
+                    <Clipboard className="h-4 w-4 mr-2" />
+                    テンプレート貼り付け
+                  </Button>
+                )}
+                
+                {hasTemplate && (
+                  <Button
+                    onClick={clearTemplate}
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    テンプレートをクリア
+                  </Button>
+                )}
+                
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
@@ -298,6 +406,10 @@ export default function SchedulesPage() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuLabel>データ操作</DropdownMenuLabel>
+                    <DropdownMenuItem onClick={() => setShowBulkImport(true)}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      CSV/TXT一括登録
+                    </DropdownMenuItem>
                     <DropdownMenuItem>
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       iCalエクスポート
@@ -423,12 +535,23 @@ export default function SchedulesPage() {
             onCancel={() => {
               setShowAddForm(false);
               setSelectedDate(null);
+              if (template) {
+                clearTemplate();
+              }
             }}
-            initialData={selectedDate ? {
-              date: selectedDate.toISOString().split('T')[0],
-            } : undefined}
+            initialData={{
+              ...(selectedDate ? { date: selectedDate.toISOString().split('T')[0] } : {}),
+              ...(template ? template.data : {}),
+            }}
           />
         )}
+
+        {/* 一括インポートダイアログ */}
+        <BulkImportDialog
+          open={showBulkImport}
+          onClose={() => setShowBulkImport(false)}
+          onImport={handleBulkImport}
+        />
       </div>
     </div>
   );
