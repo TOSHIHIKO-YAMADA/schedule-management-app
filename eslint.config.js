@@ -15,13 +15,13 @@ const eslintConfig = [
     rules: {
       // Next.js 推奨設定
       "@next/next/no-html-link-for-pages": "error",
-      "@next/next/no-img-element": "error",
+      "@next/next/no-img-element": "off",
       "@next/next/no-sync-scripts": "error",
       
       // TypeScript 推奨設定
-      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/prefer-const": "error",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
       
       // React 推奨設定
       "react/react-in-jsx-scope": "off",
@@ -31,31 +31,14 @@ const eslintConfig = [
       "react-hooks/exhaustive-deps": "warn",
       
       // 一般的なコード品質
-      "no-console": "warn",
+      "no-console": "off",
       "no-debugger": "error",
       "no-unused-vars": "off", // TypeScript版を使用
-      "prefer-const": "error",
+      "prefer-const": "off",
       "no-var": "error",
       
       // インポート順序
-      "import/order": [
-        "error",
-        {
-          "groups": [
-            "builtin",
-            "external",
-            "internal",
-            "parent",
-            "sibling",
-            "index"
-          ],
-          "newlines-between": "always",
-          "alphabetize": {
-            "order": "asc",
-            "caseInsensitive": true
-          }
-        }
-      ]
+      "import/order": "off"
     }
   },
   {

@@ -13,22 +13,22 @@ import { withAuth, isAdmin, isSuperAdmin } from '@/lib/auth-utils';
 
 // バリデーションスキーマ
 const updateVehicleUsageSchema = z.object({
-  startDateTime: z.string().min(1, '開始日時は必須です').optional(),
-  endDateTime: z.string().min(1, '終了日時は必須です').optional(),
+  startDate: z.string().min(1, '開始日時は必須です').optional(),
+  endDate: z.string().min(1, '終了日時は必須です').optional(),
   purpose: z.string().min(1, '使用目的は必須です').optional(),
-  mileageStart: z.number().int().min(0, '開始走行距離は0以上である必要があります').optional(),
-  mileageEnd: z.number().int().min(0, '終了走行距離は0以上である必要があります').optional(),
+  startMileage: z.number().int().min(0, '開始走行距離は0以上である必要があります').optional(),
+  endMileage: z.number().int().min(0, '終了走行距離は0以上である必要があります').optional(),
   vehicleId: z.string().optional(),
   employeeId: z.string().optional(),
-  scheduleId: z.string().optional(),
 });
 
 // GET /api/vehicle-usages/[id] - 車両使用履歴詳細取得
 export const GET = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const vehicleUsage = await prisma.vehicleUsage.findUnique({
       where: { id: params.id },
       include: {
@@ -37,7 +37,6 @@ export const GET = withErrorHandling(async (
             id: true,
             name: true,
             licensePlate: true,
-            type: true,
             fuelType: true,
             capacity: true,
           },
@@ -55,8 +54,8 @@ export const GET = withErrorHandling(async (
     // 走行距離を計算
     const usageWithDistance = {
       ...vehicleUsage,
-      distance: vehicleUsage.mileageEnd && vehicleUsage.mileageStart 
-        ? vehicleUsage.mileageEnd - vehicleUsage.mileageStart 
+      distance: vehicleUsage.endMileage && vehicleUsage.startMileage 
+        ? vehicleUsage.endMileage - vehicleUsage.startMileage 
         : null,
     };
 
@@ -67,9 +66,10 @@ export const GET = withErrorHandling(async (
 // PUT /api/vehicle-usages/[id] - 車両使用履歴更新
 export const PUT = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const body = await request.json();
     const validatedData = updateVehicleUsageSchema.parse(body);
 
@@ -86,14 +86,14 @@ export const PUT = withErrorHandling(async (
     }
 
     // 日時の妥当性チェック
-    const startDateTime = validatedData.startDateTime 
-      ? new Date(validatedData.startDateTime) 
-      : existingUsage.startDateTime;
-    const endDateTime = validatedData.endDateTime 
-      ? new Date(validatedData.endDateTime) 
-      : existingUsage.endDateTime;
+    const startDate = validatedData.startDate 
+      ? new Date(validatedData.startDate) 
+      : existingUsage.startDate;
+    const endDate = validatedData.endDate 
+      ? new Date(validatedData.endDate) 
+      : existingUsage.endDate;
 
-    if (endDateTime <= startDateTime) {
+    if (endDate && endDate <= startDate) {
       return createErrorResponse(
         '終了日時は開始日時より後である必要があります',
         HTTP_STATUS.BAD_REQUEST
@@ -101,10 +101,10 @@ export const PUT = withErrorHandling(async (
     }
 
     // 走行距離の妥当性チェック
-    const mileageStart = validatedData.mileageStart ?? existingUsage.mileageStart;
-    const mileageEnd = validatedData.mileageEnd ?? existingUsage.mileageEnd;
+    const startMileage = validatedData.startMileage ?? existingUsage.startMileage;
+    const endMileage = validatedData.endMileage ?? existingUsage.endMileage;
 
-    if (mileageEnd && mileageStart && mileageEnd <= mileageStart) {
+    if (endMileage && startMileage && endMileage <= startMileage) {
       return createErrorResponse(
         '終了走行距離は開始走行距離より大きい必要があります',
         HTTP_STATUS.BAD_REQUEST
@@ -124,27 +124,29 @@ export const PUT = withErrorHandling(async (
         );
       }
 
-      // 車両の重複使用チェック
-      const conflictingUsage = await prisma.vehicleUsage.findFirst({
-        where: {
-          id: { not: params.id },
-          vehicleId: validatedData.vehicleId,
-          OR: [
-            {
-              AND: [
-                { startDateTime: { lte: endDateTime } },
-                { endDateTime: { gte: startDateTime } },
-              ],
-            },
-          ],
-        },
-      });
+      // 車両の重複使用チェック（終了日時が設定されている場合のみ）
+      if (endDate) {
+        const conflictingUsage = await prisma.vehicleUsage.findFirst({
+          where: {
+            id: { not: params.id },
+            vehicleId: validatedData.vehicleId,
+            OR: [
+              {
+                AND: [
+                  { startDate: { lte: endDate } },
+                  { endDate: { gte: startDate } },
+                ],
+              },
+            ],
+          },
+        });
 
-      if (conflictingUsage) {
-        return createErrorResponse(
-          '指定された時間帯に車両は既に使用されています',
-          HTTP_STATUS.BAD_REQUEST
-        );
+        if (conflictingUsage) {
+          return createErrorResponse(
+            '指定された時間帯に車両は既に使用されています',
+            HTTP_STATUS.BAD_REQUEST
+          );
+        }
       }
     }
 
@@ -162,27 +164,14 @@ export const PUT = withErrorHandling(async (
       }
     }
 
-    // スケジュールの存在確認（変更される場合）
-    if (validatedData.scheduleId && validatedData.scheduleId !== existingUsage.scheduleId) {
-      const schedule = await prisma.schedule.findUnique({
-        where: { id: validatedData.scheduleId },
-      });
-
-      if (!schedule) {
-        return createErrorResponse(
-          '指定されたスケジュールが見つかりません',
-          HTTP_STATUS.BAD_REQUEST
-        );
-      }
-    }
 
     // 車両使用履歴を更新
     const updatedUsage = await prisma.vehicleUsage.update({
       where: { id: params.id },
       data: {
         ...validatedData,
-        startDateTime: validatedData.startDateTime ? startDateTime : undefined,
-        endDateTime: validatedData.endDateTime ? endDateTime : undefined,
+        startDate: validatedData.startDate ? new Date(validatedData.startDate) : undefined,
+        endDate: validatedData.endDate ? new Date(validatedData.endDate) : undefined,
       },
       include: {
         vehicle: {
@@ -190,7 +179,6 @@ export const PUT = withErrorHandling(async (
             id: true,
             name: true,
             licensePlate: true,
-            type: true,
           },
         },
       },
@@ -199,8 +187,8 @@ export const PUT = withErrorHandling(async (
     // 走行距離を計算
     const usageWithDistance = {
       ...updatedUsage,
-      distance: updatedUsage.mileageEnd && updatedUsage.mileageStart 
-        ? updatedUsage.mileageEnd - updatedUsage.mileageStart 
+      distance: updatedUsage.endMileage && updatedUsage.startMileage 
+        ? updatedUsage.endMileage - updatedUsage.startMileage 
         : null,
     };
 
@@ -215,9 +203,10 @@ export const PUT = withErrorHandling(async (
 // DELETE /api/vehicle-usages/[id] - 車両使用履歴削除
 export const DELETE = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     // 既存の使用履歴を確認
     const existingUsage = await prisma.vehicleUsage.findUnique({
       where: { id: params.id },

@@ -31,9 +31,10 @@ const updateVehicleSchema = z.object({
 // GET /api/vehicles/[id] - 車両詳細取得
 export const GET = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const vehicle = await prisma.vehicle.findUnique({
       where: { id: params.id },
       include: {
@@ -88,9 +89,10 @@ export const GET = withErrorHandling(async (
 // PUT /api/vehicles/[id] - 車両更新
 export const PUT = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const body = await request.json();
     const validatedData = updateVehicleSchema.parse(body);
 
@@ -140,9 +142,10 @@ export const PUT = withErrorHandling(async (
 // DELETE /api/vehicles/[id] - 車両削除
 export const DELETE = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     // 既存の車両を確認
     const existingVehicle = await prisma.vehicle.findUnique({
       where: { id: params.id },

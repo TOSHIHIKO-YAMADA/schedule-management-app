@@ -26,8 +26,9 @@ const updateCustomerSchema = z.object({
 // GET /api/customers/[id] - 顧客詳細取得
 export const GET = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
+  const params = await context.params;
   return withAuth(request, async (request, user) => {
     const customer = await prisma.customer.findUnique({
       where: { id: params.id },
@@ -47,8 +48,9 @@ export const GET = withErrorHandling(async (
 // PUT /api/customers/[id] - 顧客更新
 export const PUT = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
+  const params = await context.params;
   return withAuth(request, async (request, user) => {
     const body = await request.json();
     const validatedData = updateCustomerSchema.parse(body);
@@ -105,8 +107,9 @@ export const PUT = withErrorHandling(async (
 // DELETE /api/customers/[id] - 顧客削除
 export const DELETE = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
+  const params = await context.params;
   return withAuth(request, async (request, user) => {
     // 既存の顧客を確認
     const existingCustomer = await prisma.customer.findUnique({

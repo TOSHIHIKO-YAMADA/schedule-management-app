@@ -6,12 +6,11 @@ async function main() {
   console.log('🌱 データベースシード開始...');
 
   // 既存データのクリア
-  await prisma.activityLog.deleteMany();
   await prisma.task.deleteMany();
-  await prisma.scheduleAttendee.deleteMany();
+  await prisma.scheduleAssignment.deleteMany();
+  await prisma.scheduleTimeSlot.deleteMany();
   await prisma.schedule.deleteMany();
   await prisma.vehicleUsage.deleteMany();
-  await prisma.notificationSettings.deleteMany();
   await prisma.employee.deleteMany();
   await prisma.customer.deleteMany();
   await prisma.vehicle.deleteMany();
@@ -21,7 +20,6 @@ async function main() {
     data: [
       {
         id: 'emp_1',
-        employeeNumber: 'EMP001',
         name: '田中 太郎',
         nameKana: 'タナカ タロウ',
         email: 'tanaka@example.com',
@@ -30,10 +28,10 @@ async function main() {
         transportation: 'train',
         role: 'admin',
         department: '営業部',
+        position: '部長',
       },
       {
         id: 'emp_2',
-        employeeNumber: 'EMP002',
         name: '佐藤 花子',
         nameKana: 'サトウ ハナコ',
         email: 'sato@example.com',
@@ -42,10 +40,10 @@ async function main() {
         transportation: 'train',
         role: 'general',
         department: '営業部',
+        position: '主任',
       },
       {
         id: 'emp_3',
-        employeeNumber: 'EMP003',
         name: '鈴木 次郎',
         nameKana: 'スズキ ジロウ',
         email: 'suzuki@example.com',
@@ -54,10 +52,10 @@ async function main() {
         transportation: 'car',
         role: 'general',
         department: '技術部',
+        position: 'エンジニア',
       },
       {
         id: 'emp_4',
-        employeeNumber: 'EMP004',
         name: '高橋 美咲',
         nameKana: 'タカハシ ミサキ',
         email: 'takahashi@example.com',
@@ -66,6 +64,7 @@ async function main() {
         transportation: 'bicycle',
         role: 'limited_admin',
         department: '管理部',
+        position: '課長',
       },
     ],
   });
@@ -112,8 +111,10 @@ async function main() {
         id: 'veh_1',
         name: 'プリウス1号車',
         licensePlate: '品川500あ1234',
-        inspectionDate: '2025-08-15',
-        type: 'sedan',
+        inspectionDate: new Date('2025-08-15'),
+        model: 'プリウス',
+        manufacturer: 'トヨタ',
+        year: 2022,
         capacity: 5,
         fuelType: 'hybrid',
       },
@@ -121,8 +122,10 @@ async function main() {
         id: 'veh_2',
         name: 'ハイエース',
         licensePlate: '品川400さ5678',
-        inspectionDate: '2025-11-20',
-        type: 'van',
+        inspectionDate: new Date('2025-11-20'),
+        model: 'ハイエース',
+        manufacturer: 'トヨタ',
+        year: 2021,
         capacity: 8,
         fuelType: 'gasoline',
       },
@@ -130,8 +133,10 @@ async function main() {
         id: 'veh_3',
         name: 'アクア2号車',
         licensePlate: '品川500か9012',
-        inspectionDate: '2025-06-30',
-        type: 'sedan',
+        inspectionDate: new Date('2025-06-30'),
+        model: 'アクア',
+        manufacturer: 'トヨタ',
+        year: 2023,
         capacity: 5,
         fuelType: 'hybrid',
       },
@@ -145,68 +150,56 @@ async function main() {
         id: 'sch_1',
         title: 'サンプル商事様との営業会議',
         description: '新商品提案とQ1の売上報告について',
-        startDate: '2025-01-15',
-        endDate: '2025-01-15',
-        startTime: '10:00',
-        endTime: '12:00',
-        category: 'meeting',
-        priority: 'high',
+        startTime: new Date('2025-01-15T10:00:00'),
+        endTime: new Date('2025-01-15T12:00:00'),
+        type: 'meeting',
         location: '株式会社サンプル商事 会議室A',
         status: 'scheduled',
+        employeeId: 'emp_1',
         customerId: 'cust_1',
         vehicleId: 'veh_1',
         createdBy: 'emp_1',
-        reminderEnabled: true,
-        reminderMinutesBefore: 30,
+        reminderMinutes: 30,
       },
       {
         id: 'sch_2',
         title: 'システム保守作業',
         description: 'サーバーメンテナンスとセキュリティアップデート',
-        startDate: '2025-01-16',
-        endDate: '2025-01-16',
-        startTime: '18:00',
-        endTime: '22:00',
-        category: 'maintenance',
-        priority: 'medium',
+        startTime: new Date('2025-01-16T18:00:00'),
+        endTime: new Date('2025-01-16T22:00:00'),
+        type: 'maintenance',
         location: '本社データセンター',
         status: 'scheduled',
+        employeeId: 'emp_3',
         createdBy: 'emp_3',
-        reminderEnabled: true,
-        reminderMinutesBefore: 60,
+        reminderMinutes: 60,
       },
       {
         id: 'sch_3',
         title: 'テスト株式会社様システム導入',
         description: 'CRMシステムの導入支援と初期設定',
-        startDate: '2025-01-17',
-        endDate: '2025-01-17',
-        startTime: '13:00',
-        endTime: '17:00',
-        category: 'travel',
-        priority: 'high',
+        startTime: new Date('2025-01-17T13:00:00'),
+        endTime: new Date('2025-01-17T17:00:00'),
+        type: 'fieldwork',
         location: 'テスト株式会社 本社',
         status: 'scheduled',
+        employeeId: 'emp_2',
         customerId: 'cust_2',
         vehicleId: 'veh_2',
         createdBy: 'emp_2',
-        reminderEnabled: true,
-        reminderMinutesBefore: 45,
+        reminderMinutes: 45,
       },
       {
         id: 'sch_4',
         title: '月次売上レポート作成',
         description: '12月度の売上実績まとめと分析',
-        startDate: '2025-01-20',
-        endDate: '2025-01-20',
-        startTime: '09:00',
-        endTime: '11:00',
-        category: 'report',
-        priority: 'medium',
+        startTime: new Date('2025-01-20T09:00:00'),
+        endTime: new Date('2025-01-20T11:00:00'),
+        type: 'work',
         location: '本社',
         status: 'scheduled',
+        employeeId: 'emp_4',
         createdBy: 'emp_4',
-        reminderEnabled: false,
       },
     ],
   });
@@ -220,10 +213,9 @@ async function main() {
         description: 'サンプル商事様向け新商品の提案資料を作成',
         priority: 'high',
         status: 'in_progress',
-        dueDate: '2025-01-15',
-        progress: 70,
+        dueDate: new Date('2025-01-15'),
         assignedTo: 'emp_1',
-        scheduleId: 'sch_1',
+        customerId: 'cust_1',
         createdBy: 'emp_1',
       },
       {
@@ -232,10 +224,8 @@ async function main() {
         description: 'Webサーバーのセキュリティパッチを適用',
         priority: 'high',
         status: 'pending',
-        dueDate: '2025-01-16',
-        progress: 0,
+        dueDate: new Date('2025-01-16'),
         assignedTo: 'emp_3',
-        scheduleId: 'sch_2',
         createdBy: 'emp_3',
       },
       {
@@ -244,10 +234,9 @@ async function main() {
         description: 'テスト株式会社様向けCRMの操作マニュアル作成',
         priority: 'medium',
         status: 'pending',
-        dueDate: '2025-01-17',
-        progress: 30,
+        dueDate: new Date('2025-01-17'),
         assignedTo: 'emp_2',
-        scheduleId: 'sch_3',
+        customerId: 'cust_2',
         createdBy: 'emp_2',
       },
       {
@@ -256,53 +245,10 @@ async function main() {
         description: '12月度売上データの集計と整理',
         priority: 'medium',
         status: 'completed',
-        dueDate: '2025-01-19',
-        progress: 100,
+        dueDate: new Date('2025-01-19'),
         assignedTo: 'emp_4',
-        scheduleId: 'sch_4',
         createdBy: 'emp_4',
-      },
-    ],
-  });
-
-  // 通知設定作成
-  const notificationSettings = await prisma.notificationSettings.createMany({
-    data: [
-      {
-        userId: 'emp_1',
-        scheduleReminder: true,
-        vehicleInspectionAlert: true,
-        taskDeadlineAlert: true,
-        emailNotifications: true,
-        lineNotifications: false,
-        reminderMinutes: 30,
-      },
-      {
-        userId: 'emp_2',
-        scheduleReminder: true,
-        vehicleInspectionAlert: false,
-        taskDeadlineAlert: true,
-        emailNotifications: true,
-        lineNotifications: true,
-        reminderMinutes: 15,
-      },
-      {
-        userId: 'emp_3',
-        scheduleReminder: true,
-        vehicleInspectionAlert: true,
-        taskDeadlineAlert: true,
-        emailNotifications: false,
-        lineNotifications: true,
-        reminderMinutes: 60,
-      },
-      {
-        userId: 'emp_4',
-        scheduleReminder: true,
-        vehicleInspectionAlert: true,
-        taskDeadlineAlert: true,
-        emailNotifications: true,
-        lineNotifications: false,
-        reminderMinutes: 45,
+        completedAt: new Date('2025-01-18T16:30:00'),
       },
     ],
   });
@@ -314,7 +260,6 @@ async function main() {
   console.log(`   - 車両: 3件`);
   console.log(`   - スケジュール: 4件`);
   console.log(`   - タスク: 4件`);
-  console.log(`   - 通知設定: 4件`);
 }
 
 main()

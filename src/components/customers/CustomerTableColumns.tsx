@@ -91,7 +91,7 @@ export const createCustomerTableColumns = ({
             size="md"
             src=""
             alt={customer.name}
-            fallback={<Building2 className="h-5 w-5" />}
+            fallback={customer.name.charAt(0).toUpperCase()}
           />
           <div className="flex flex-col">
             <span className="font-medium text-gray-900">{customer.name}</span>

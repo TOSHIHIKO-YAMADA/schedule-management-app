@@ -261,18 +261,35 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       // スケジュール作成
       const schedule = await tx.schedule.create({
         data: {
-          ...scheduleData,
+          title: scheduleData.title,
+          description: scheduleData.description,
           startTime: new Date(scheduleData.startTime),
           endTime: new Date(scheduleData.endTime),
-          equipment: equipment.length > 0 ? JSON.stringify(equipment) : null,
+          allDay: scheduleData.allDay ?? false,
+          type: scheduleData.type || 'work',
+          status: scheduleData.status || 'scheduled',
+          location: scheduleData.location,
+          address: scheduleData.address,
+          siteName: scheduleData.siteName,
+          requiredPersons: scheduleData.requiredPersons,
+          responsibleId: scheduleData.responsibleId,
+          meetingPoint: scheduleData.meetingPoint,
+          meetingCategory: scheduleData.meetingCategory,
+          equipment: equipment && equipment.length > 0 ? JSON.stringify(equipment) : null,
+          employeeId: scheduleData.employeeId,
+          customerId: scheduleData.customerId,
+          vehicleId: scheduleData.vehicleId,
+          isRecurring: scheduleData.isRecurring ?? false,
+          recurringPattern: scheduleData.recurringDays ? 'custom' : null,
           recurringEnd: scheduleData.recurringEnd ? new Date(scheduleData.recurringEnd) : null,
-          recurringPattern: scheduleData.recurringDays ? JSON.stringify(scheduleData.recurringDays) : null,
+          canDuplicate: scheduleData.canDuplicate ?? false,
+          reminderMinutes: scheduleData.reminderMinutes,
           createdBy: user.id,
         },
       });
 
       // 時間帯作成
-      if (timeSlots.length > 0) {
+      if (timeSlots && timeSlots.length > 0) {
         await tx.scheduleTimeSlot.createMany({
           data: timeSlots.map((slot, index) => ({
             scheduleId: schedule.id,
@@ -285,7 +302,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       }
 
       // 担当者割り当て作成
-      if (assignments.length > 0) {
+      if (assignments && assignments.length > 0) {
         await tx.scheduleAssignment.createMany({
           data: assignments.map((assignment) => ({
             scheduleId: schedule.id,

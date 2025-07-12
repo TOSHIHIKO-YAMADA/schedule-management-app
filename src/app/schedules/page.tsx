@@ -136,7 +136,7 @@ export default function SchedulesPage() {
         meetingPoint: data.meetingPoint,
         meetingCategory: data.meetingCategory,
         isRecurring: data.isRecurring,
-        recurringPattern: data.recurringPattern,
+        recurringDays: data.recurringDays,
         recurringEnd: data.recurringEnd ? new Date(data.recurringEnd).toISOString() : undefined,
         canDuplicate: data.canDuplicate,
         description: data.notes,
@@ -521,7 +521,7 @@ export default function SchedulesPage() {
                   setShowAddForm(true);
                 } : undefined}
                 isLoading={isLoading}
-                viewMode={viewMode === 'list' ? 'month' : viewMode}
+                viewMode={(viewMode as any) !== 'list' ? (viewMode as any) : 'month'}
                 onViewModeChange={(mode) => setViewMode(mode)}
               />
             </div>

@@ -176,7 +176,7 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
           </Badge>
         )
       }
-      subtitle={customer?.industry}
+      subtitle={customer?.industry ?? undefined}
       detailContent={detailContent}
       editContent={editContent}
     />

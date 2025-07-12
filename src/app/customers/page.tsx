@@ -185,7 +185,7 @@ export default function CustomersPage() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const allIds = new Set(currentCustomers.map(c => c.id));
+      const allIds = new Set<string>(currentCustomers.map((c: any) => c.id as string));
       setSelectedCustomerIds(allIds);
     } else {
       setSelectedCustomerIds(new Set());

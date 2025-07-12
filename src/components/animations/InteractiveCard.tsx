@@ -24,26 +24,14 @@ export const InteractiveCard: React.FC<InteractiveCardProps> = ({
     rest: {
       scale: 1,
       y: 0,
-      transition: {
-        duration: 0.2,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     },
     hover: {
       scale: hoverScale,
       y: -4,
-      transition: {
-        duration: 0.2,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     },
     tap: {
       scale: tapScale,
       y: 0,
-      transition: {
-        duration: 0.1,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     }
   };
 
@@ -84,24 +72,12 @@ export const InteractiveButton: React.FC<{
   const buttonVariants = {
     rest: {
       scale: 1,
-      transition: {
-        duration: 0.2,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     },
     hover: {
       scale: disabled ? 1 : 1.05,
-      transition: {
-        duration: 0.2,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     },
     tap: {
       scale: disabled ? 1 : 0.95,
-      transition: {
-        duration: 0.1,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     }
   };
 
@@ -168,26 +144,14 @@ export const InteractiveIcon: React.FC<{
     rest: {
       scale: 1,
       rotate: 0,
-      transition: {
-        duration: 0.2,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     },
     hover: {
       scale: 1.1,
       rotate: 5,
-      transition: {
-        duration: 0.2,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     },
     tap: {
       scale: 0.9,
       rotate: 0,
-      transition: {
-        duration: 0.1,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     }
   };
 
@@ -221,18 +185,10 @@ export const InteractiveListItem: React.FC<{
     rest: {
       x: 0,
       backgroundColor: "rgba(0, 0, 0, 0)",
-      transition: {
-        duration: 0.2,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     },
     hover: {
       x: 4,
       backgroundColor: "rgba(59, 130, 246, 0.05)",
-      transition: {
-        duration: 0.2,
-        ease: [0.25, 0.25, 0.25, 1]
-      }
     }
   };
 

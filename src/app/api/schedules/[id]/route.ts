@@ -67,8 +67,9 @@ const updateScheduleSchema = z.object({
 });
 
 // GET /api/schedules/[id] - スケジュール詳細取得
-export const GET = withErrorHandling(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export const GET = withErrorHandling(async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const { id } = params;
 
     const schedule = await prisma.schedule.findUnique({
@@ -170,8 +171,9 @@ export const GET = withErrorHandling(async (request: NextRequest, { params }: { 
 });
 
 // PUT /api/schedules/[id] - スケジュール更新
-export const PUT = withErrorHandling(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export const PUT = withErrorHandling(async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const { id } = params;
     const body = await request.json();
     const validatedData = validateRequestBody(updateScheduleSchema, body);
@@ -391,8 +393,9 @@ export const PUT = withErrorHandling(async (request: NextRequest, { params }: { 
 });
 
 // DELETE /api/schedules/[id] - スケジュール削除
-export const DELETE = withErrorHandling(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export const DELETE = withErrorHandling(async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const { id } = params;
 
     // スケジュールの存在確認

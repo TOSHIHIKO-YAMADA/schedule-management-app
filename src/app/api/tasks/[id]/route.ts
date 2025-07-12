@@ -26,9 +26,10 @@ const updateTaskSchema = z.object({
 // GET /api/tasks/[id] - タスク詳細取得
 export const GET = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const task = await prisma.task.findUnique({
       where: { id: params.id },
       include: {
@@ -40,35 +41,11 @@ export const GET = withErrorHandling(async (
             department: true,
           },
         },
-        schedule: {
+        customer: {
           select: {
             id: true,
-            title: true,
-            startDate: true,
-            endDate: true,
-            status: true,
-            customer: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
+            name: true,
           },
-        },
-        activityLogs: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-          orderBy: {
-            timestamp: 'desc',
-          },
-          take: 10,
         },
       },
     });
@@ -87,9 +64,10 @@ export const GET = withErrorHandling(async (
 // PUT /api/tasks/[id] - タスク更新
 export const PUT = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const body = await request.json();
     const validatedData = updateTaskSchema.parse(body);
 
@@ -150,28 +128,7 @@ export const PUT = withErrorHandling(async (
           description = `タスク「${updatedTask.title}」をキャンセルしました`;
         }
 
-        await tx.activityLog.create({
-          data: {
-            action,
-            entityType: 'task',
-            entityId: updatedTask.id,
-            entityName: updatedTask.title,
-            description,
-            userId: existingTask.createdBy, // TODO: 実際の更新者IDを使用
-          },
-        });
       } else {
-        // 通常の更新ログ
-        await tx.activityLog.create({
-          data: {
-            action: 'update',
-            entityType: 'task',
-            entityId: updatedTask.id,
-            entityName: updatedTask.title,
-            description: `タスク「${updatedTask.title}」を更新しました`,
-            userId: existingTask.createdBy, // TODO: 実際の更新者IDを使用
-          },
-        });
       }
 
       return updatedTask;
@@ -188,14 +145,6 @@ export const PUT = withErrorHandling(async (
             email: true,
           },
         },
-        schedule: {
-          select: {
-            id: true,
-            title: true,
-            startDate: true,
-            endDate: true,
-          },
-        },
       },
     });
 
@@ -210,9 +159,10 @@ export const PUT = withErrorHandling(async (
 // DELETE /api/tasks/[id] - タスク削除
 export const DELETE = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     // 既存のタスクを確認
     const existingTask = await validateEntityExists(
       await prisma.task.findUnique({
@@ -223,17 +173,6 @@ export const DELETE = withErrorHandling(async (
 
     // トランザクションで削除
     await prisma.$transaction(async (tx) => {
-      // 削除の活動ログ記録（削除前に記録）
-      await tx.activityLog.create({
-        data: {
-          action: 'delete',
-          entityType: 'task',
-          entityId: params.id,
-          entityName: existingTask.title,
-          description: `タスク「${existingTask.title}」を削除しました`,
-          userId: existingTask.createdBy, // TODO: 実際の削除者IDを使用
-        },
-      });
 
       // タスク削除
       await tx.task.delete({

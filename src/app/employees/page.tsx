@@ -197,7 +197,7 @@ export default function EmployeesPage() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const allIds = new Set(currentEmployees.map((emp: Employee) => emp.id));
+      const allIds = new Set<string>(currentEmployees.map((emp: Employee) => emp.id));
       setSelectedEmployeeIds(allIds);
     } else {
       setSelectedEmployeeIds(new Set());

@@ -72,7 +72,7 @@ export function FieldworkScheduleForm({
     setValue,
     formState: { errors },
   } = useForm<FieldworkScheduleFormData>({
-    resolver: zodResolver(fieldworkScheduleSchema),
+    resolver: zodResolver(fieldworkScheduleSchema) as any,
     defaultValues: {
       ...defaultFormValues,
       ...initialData,
@@ -510,14 +510,14 @@ export function FieldworkScheduleForm({
                   <div>
                     <Label className="text-sm text-gray-600">従業員 <span className="text-red-500">*</span></Label>
                     <Select
-                      value={watch(`assignments.${index}.employeeId`) || ''}
-                      onValueChange={(value) => setValue(`assignments.${index}.employeeId`, value)}
+                      value={watch(`assignments.${index}.employeeId`) || 'unassigned'}
+                      onValueChange={(value) => setValue(`assignments.${index}.employeeId`, value === 'unassigned' ? '' : value)}
                     >
                       <SelectTrigger className="mt-1">
                         <SelectValue placeholder="従業員を選択または未割り当て" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">未割り当て</SelectItem>
+                        <SelectItem value="unassigned">未割り当て</SelectItem>
                         {employees.map((employee: any) => (
                           <SelectItem key={employee.id} value={employee.id}>
                             {employee.name} ({employee.department} - {employee.position})
@@ -537,13 +537,14 @@ export function FieldworkScheduleForm({
                     <div>
                       <Label className="text-sm text-gray-600">役職</Label>
                       <Select
-                        value={watch(`assignments.${index}.role`) || ''}
-                        onValueChange={(value) => setValue(`assignments.${index}.role`, value)}
+                        value={watch(`assignments.${index}.role`) || 'none'}
+                        onValueChange={(value) => setValue(`assignments.${index}.role`, value === 'none' ? '' : value)}
                       >
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder="役職を選択" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="none">選択なし</SelectItem>
                           <SelectItem value="worker">作業員</SelectItem>
                           <SelectItem value="leader">リーダー</SelectItem>
                           <SelectItem value="supervisor">主任</SelectItem>
@@ -569,13 +570,14 @@ export function FieldworkScheduleForm({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-1">
                       <div>
                         <Select
-                          value={watch(`assignments.${index}.gatheringPlace`) || ''}
-                          onValueChange={(value) => setValue(`assignments.${index}.gatheringPlace`, value)}
+                          value={watch(`assignments.${index}.gatheringPlace`) || 'none'}
+                          onValueChange={(value) => setValue(`assignments.${index}.gatheringPlace`, value === 'none' ? '' : value)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="集合場所を選択" />
                           </SelectTrigger>
                           <SelectContent>
+                            <SelectItem value="none">選択なし</SelectItem>
                             <SelectItem value="site">現場</SelectItem>
                             <SelectItem value="office">事務所</SelectItem>
                             <SelectItem value="nearby">現場近隣</SelectItem>

@@ -29,9 +29,10 @@ const updateEmployeeSchema = z.object({
 // GET /api/employees/[id] - 従業員詳細取得
 export const GET = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const employee = await prisma.employee.findUnique({
       where: { id: params.id },
     });
@@ -50,9 +51,10 @@ export const GET = withErrorHandling(async (
 // PUT /api/employees/[id] - 従業員更新
 export const PUT = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     const body = await request.json();
     const validatedData = updateEmployeeSchema.parse(body);
 
@@ -101,9 +103,10 @@ export const PUT = withErrorHandling(async (
 // DELETE /api/employees/[id] - 従業員削除
 export const DELETE = withErrorHandling(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   return withAuth(request, async (request, user) => {
+    const params = await context.params;
     // 既存の従業員を確認
     const existingEmployee = await prisma.employee.findUnique({
       where: { id: params.id },

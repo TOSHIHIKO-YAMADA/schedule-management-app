@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import prisma from '@/lib/prisma';
 import { createErrorResponse, HTTP_STATUS } from '@/lib/api-utils';
@@ -96,19 +96,20 @@ export async function getCurrentUser(request: NextRequest) {
 
   // 本番環境またはClerk認証有効時
   try {
-    const { userId: clerkUserId } = auth();
+    const { userId: clerkUserId } = await auth();
     
     if (!clerkUserId) {
       return null;
     }
 
     // ClerkのuserIdをemployeeテーブルのclerkIdで検索
+    const clerkEmail = await getClerkUserEmail(clerkUserId);
     const user = await prisma.employee.findFirst({
       where: { 
         OR: [
           { clerkId: clerkUserId },
           // フォールバック: メールアドレスでマッチング（初回ログイン時）
-          { email: await getClerkUserEmail(clerkUserId) }
+          ...(clerkEmail ? [{ email: clerkEmail }] : [])
         ]
       },
       select: {
@@ -188,13 +189,13 @@ export function checkApiPermission(method: string, pathname: string, userRole: U
     return false;
   }
 
-  return hasPermission(userRole, requiredRoles);
+  return hasPermission(userRole, requiredRoles as unknown as UserRole[]);
 }
 
 // 認証ミドルウェア関数
 export async function withAuth(
   request: NextRequest,
-  handler: (request: NextRequest, user: any) => Promise<Response>
+  handler: (request: NextRequest, user: any) => Promise<NextResponse>
 ) {
   // 開発環境でも適切な認証チェックを実行
   const method = request.method;

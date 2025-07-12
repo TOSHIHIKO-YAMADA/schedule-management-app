@@ -121,7 +121,13 @@ export const TestDataFactory = {
 };
 
 // アサーション関数
-export const assert = {
+export const assert: {
+  isSuccessResponse<T>(response: TestApiResponse<T>): asserts response is TestApiResponse<T> & { success: true };
+  isErrorResponse<T>(response: TestApiResponse<T>): asserts response is TestApiResponse<T> & { success: false };
+  hasData<T>(response: TestApiResponse<T>): asserts response is TestApiResponse<T> & { data: T };
+  hasMessage(response: TestApiResponse): asserts response is TestApiResponse & { message: string };
+  isArray<T>(data: T): asserts data is T & any[];
+} = {
   isSuccessResponse<T>(response: TestApiResponse<T>): asserts response is TestApiResponse<T> & { success: true } {
     if (!response.success) {
       throw new Error(`Expected success response, got: ${JSON.stringify(response)}`);
@@ -176,7 +182,7 @@ export async function runApiTests() {
 
   // 従業員API テスト
   await test('GET /api/employees', async () => {
-    const response = await api.get('/employees');
+    const response: any = await api.get('/employees');
     assert.isSuccessResponse(response);
     assert.hasData(response);
     assert.isArray(response.data);
@@ -184,7 +190,7 @@ export async function runApiTests() {
 
   // 顧客API テスト
   await test('GET /api/customers', async () => {
-    const response = await api.get('/customers');
+    const response: any = await api.get('/customers');
     assert.isSuccessResponse(response);
     assert.hasData(response);
     assert.isArray(response.data);
@@ -192,7 +198,7 @@ export async function runApiTests() {
 
   // 車両API テスト
   await test('GET /api/vehicles', async () => {
-    const response = await api.get('/vehicles');
+    const response: any = await api.get('/vehicles');
     assert.isSuccessResponse(response);
     assert.hasData(response);
     assert.isArray(response.data);
@@ -200,7 +206,7 @@ export async function runApiTests() {
 
   // タスクAPI テスト
   await test('GET /api/tasks', async () => {
-    const response = await api.get('/tasks');
+    const response: any = await api.get('/tasks');
     assert.isSuccessResponse(response);
     assert.hasData(response);
     assert.isArray(response.data);
@@ -208,7 +214,7 @@ export async function runApiTests() {
 
   // 車両使用履歴API テスト
   await test('GET /api/vehicle-usages', async () => {
-    const response = await api.get('/vehicle-usages');
+    const response: any = await api.get('/vehicle-usages');
     assert.isSuccessResponse(response);
     assert.hasData(response);
     assert.isArray(response.data);
@@ -216,7 +222,7 @@ export async function runApiTests() {
 
   // スケジュールAPI テスト
   await test('GET /api/schedules', async () => {
-    const response = await api.get('/schedules');
+    const response: any = await api.get('/schedules');
     assert.isSuccessResponse(response);
     assert.hasData(response);
     assert.isArray(response.data);

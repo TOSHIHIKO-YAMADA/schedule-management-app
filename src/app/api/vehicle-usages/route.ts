@@ -12,11 +12,11 @@ import { withAuth } from '@/lib/auth-utils';
 
 // バリデーションスキーマ
 const createVehicleUsageSchema = z.object({
-  startDateTime: z.string().min(1, '開始日時は必須です'),
-  endDateTime: z.string().min(1, '終了日時は必須です'),
+  startDate: z.string().min(1, '開始日時は必須です'),
+  endDate: z.string().min(1, '終了日時は必須です'),
   purpose: z.string().min(1, '使用目的は必須です'),
-  mileageStart: z.number().int().min(0, '開始走行距離は0以上である必要があります').optional(),
-  mileageEnd: z.number().int().min(0, '終了走行距離は0以上である必要があります').optional(),
+  startMileage: z.number().int().min(0, '開始走行距離は0以上である必要があります').optional(),
+  endMileage: z.number().int().min(0, '終了走行距離は0以上である必要があります').optional(),
   vehicleId: z.string().min(1, '車両は必須です'),
   employeeId: z.string().min(1, '使用者は必須です'),
   scheduleId: z.string().min(1, 'スケジュールは必須です'),
@@ -48,12 +48,12 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
     }
 
     if (dateFrom || dateTo) {
-      where.startDateTime = {};
+      where.startDate = {};
       if (dateFrom) {
-        where.startDateTime.gte = new Date(dateFrom);
+        where.startDate.gte = new Date(dateFrom);
       }
       if (dateTo) {
-        where.startDateTime.lte = new Date(dateTo);
+        where.startDate.lte = new Date(dateTo);
       }
     }
 
@@ -65,20 +65,19 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
             id: true,
             name: true,
             licensePlate: true,
-            type: true,
           },
         },
       },
       orderBy: {
-        startDateTime: 'desc',
+        startDate: 'desc',
       },
     });
 
     // 走行距離を計算
     const usagesWithDistance = vehicleUsages.map(usage => ({
       ...usage,
-      distance: usage.mileageEnd && usage.mileageStart 
-        ? usage.mileageEnd - usage.mileageStart 
+      distance: usage.endMileage && usage.startMileage 
+        ? usage.endMileage - usage.startMileage 
         : null,
     }));
 
@@ -93,10 +92,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     const validatedData = validateRequestBody(createVehicleUsageSchema, body);
 
     // 日時の妥当性チェック
-    const startDateTime = new Date(validatedData.startDateTime);
-    const endDateTime = new Date(validatedData.endDateTime);
+    const startDate = new Date(validatedData.startDate);
+    const endDate = new Date(validatedData.endDate);
 
-    if (endDateTime <= startDateTime) {
+    if (endDate <= startDate) {
       return createErrorResponse(
         '終了日時は開始日時より後である必要があります',
         HTTP_STATUS.BAD_REQUEST
@@ -104,8 +103,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     }
 
     // 走行距離の妥当性チェック
-    if (validatedData.mileageEnd && validatedData.mileageStart) {
-      if (validatedData.mileageEnd <= validatedData.mileageStart) {
+    if (validatedData.endMileage && validatedData.startMileage) {
+      if (validatedData.endMileage <= validatedData.startMileage) {
         return createErrorResponse(
           '終了走行距離は開始走行距離より大きい必要があります',
           HTTP_STATUS.BAD_REQUEST
@@ -132,8 +131,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         OR: [
           {
             AND: [
-              { startDateTime: { lte: endDateTime } },
-              { endDateTime: { gte: startDateTime } },
+              { startDate: { lte: endDate } },
+              { endDate: { gte: startDate } },
             ],
           },
         ],
@@ -181,8 +180,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     const vehicleUsage = await prisma.vehicleUsage.create({
       data: {
         ...validatedData,
-        startDateTime,
-        endDateTime,
+        startDate,
+        endDate,
       },
       include: {
         vehicle: {
@@ -190,7 +189,6 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
             id: true,
             name: true,
             licensePlate: true,
-            type: true,
           },
         },
       },
@@ -199,8 +197,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     // 走行距離を計算
     const usageWithDistance = {
       ...vehicleUsage,
-      distance: vehicleUsage.mileageEnd && vehicleUsage.mileageStart 
-        ? vehicleUsage.mileageEnd - vehicleUsage.mileageStart 
+      distance: vehicleUsage.endMileage && vehicleUsage.startMileage 
+        ? vehicleUsage.endMileage - vehicleUsage.startMileage 
         : null,
     };
 

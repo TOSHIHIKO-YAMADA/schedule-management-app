@@ -73,14 +73,6 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
             email: true,
           },
         },
-        schedule: {
-          select: {
-            id: true,
-            title: true,
-            startDate: true,
-            endDate: true,
-          },
-        },
       },
       orderBy: [
         { status: 'asc' },
@@ -132,17 +124,6 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         data: validatedData,
       });
 
-      // 活動ログ記録
-      await tx.activityLog.create({
-        data: {
-          action: 'create',
-          entityType: 'task',
-          entityId: task.id,
-          entityName: task.title,
-          description: `タスク「${task.title}」を作成しました`,
-          userId: validatedData.createdBy,
-        },
-      });
 
       return task;
     });
@@ -156,14 +137,6 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
             id: true,
             name: true,
             email: true,
-          },
-        },
-        schedule: {
-          select: {
-            id: true,
-            title: true,
-            startDate: true,
-            endDate: true,
           },
         },
       },

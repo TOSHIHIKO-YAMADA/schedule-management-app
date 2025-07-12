@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { use } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { EmployeeForm } from "@/components/employees/EmployeeForm";
@@ -9,14 +9,14 @@ import { ApiErrorAlert } from "@/components/ui/ApiErrorAlert";
 import { apiClient } from "@/lib/api-client";
 
 interface EditEmployeePageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EditEmployeePage({ params }: EditEmployeePageProps) {
   const router = useRouter();
-  const { id } = params;
+  const { id } = use(params);
 
   const { data: employee, isLoading, error } = useQuery({
     queryKey: ['employee', id],
