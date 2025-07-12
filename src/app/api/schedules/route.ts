@@ -20,9 +20,11 @@ const timeSlotSchema = z.object({
 
 // 担当者割り当てスキーマ
 const assignmentSchema = z.object({
-  employeeId: z.string().min(1),
-  role: z.string().min(1),
+  employeeId: z.string().optional(),
+  role: z.string().optional(),
   isManager: z.boolean().default(false),
+  gatheringPlace: z.string().optional(),
+  gatheringAddress: z.string().optional(),
 });
 
 // スケジュール作成スキーマ
@@ -52,7 +54,7 @@ const createScheduleSchema = z.object({
   
   // 繰り返し設定
   isRecurring: z.boolean().default(false),
-  recurringPattern: z.enum(['daily', 'weekly', 'monthly']).optional(),
+  recurringDays: z.array(z.string()).optional(),
   recurringEnd: z.string().datetime().optional(),
   canDuplicate: z.boolean().default(false),
   
@@ -264,6 +266,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
           endTime: new Date(scheduleData.endTime),
           equipment: equipment.length > 0 ? JSON.stringify(equipment) : null,
           recurringEnd: scheduleData.recurringEnd ? new Date(scheduleData.recurringEnd) : null,
+          recurringPattern: scheduleData.recurringDays ? JSON.stringify(scheduleData.recurringDays) : null,
           createdBy: user.id,
         },
       });
@@ -286,9 +289,11 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         await tx.scheduleAssignment.createMany({
           data: assignments.map((assignment) => ({
             scheduleId: schedule.id,
-            employeeId: assignment.employeeId,
-            role: assignment.role,
+            employeeId: assignment.employeeId || null,
+            role: assignment.role || null,
             isManager: assignment.isManager,
+            gatheringPlace: assignment.gatheringPlace || null,
+            gatheringAddress: assignment.gatheringAddress || null,
           })),
         });
       }

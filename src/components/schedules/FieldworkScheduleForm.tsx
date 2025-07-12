@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Search, Trash2, X, MapPin } from 'lucide-react';
@@ -113,6 +113,30 @@ export function FieldworkScheduleForm({
       isManager: false,
     });
   };
+
+  // 時間帯の必要人数を監視し、担当者割り当てを動的に調整
+  const watchedTimeSlots = watch('timeSlots');
+  const totalRequiredPersons = watchedTimeSlots?.reduce((total, slot) => total + (slot.requiredPersons || 0), 0) || 0;
+
+  // 担当者割り当て数を必要人数に合わせて調整
+  React.useEffect(() => {
+    const currentAssignments = assignmentFields.length;
+    if (totalRequiredPersons > currentAssignments) {
+      // 足りない分を追加
+      for (let i = currentAssignments; i < totalRequiredPersons; i++) {
+        appendAssignment({
+          employeeId: '',
+          role: '',
+          isManager: false,
+        });
+      }
+    } else if (totalRequiredPersons < currentAssignments && totalRequiredPersons > 0) {
+      // 余分な分を削除
+      for (let i = currentAssignments - 1; i >= totalRequiredPersons; i--) {
+        removeAssignment(i);
+      }
+    }
+  }, [totalRequiredPersons, assignmentFields.length, appendAssignment, removeAssignment]);
 
   // 勤務時間計算関数
   const calculateWorkingHours = (startTime: string, endTime: string): string => {
@@ -433,89 +457,119 @@ export function FieldworkScheduleForm({
           {/* 担当者割り当て */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <Label className="text-sm font-medium text-gray-700">担当者割り当て (1名):</Label>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addAssignment}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                担当者追加
-              </Button>
+              <Label className="text-sm font-medium text-gray-700">
+                担当者割り当て ({totalRequiredPersons}名必要)
+              </Label>
+              <span className="text-sm text-gray-500">
+                時間帯の必要人数に応じて自動調整されます
+              </span>
             </div>
 
             {assignmentFields.map((field, index) => (
               <div key={field.id} className="border rounded-lg p-4 bg-gray-50 mb-3">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-medium text-gray-900">担当者 {index + 1}</h4>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeAssignment(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
+                  {/* 従業員選択 */}
                   <div>
-                    <Label className="text-sm text-gray-600">役職</Label>
-                    <Select>
+                    <Label className="text-sm text-gray-600">従業員 <span className="text-red-500">*</span></Label>
+                    <Select
+                      value={watch(`assignments.${index}.employeeId`) || ''}
+                      onValueChange={(value) => setValue(`assignments.${index}.employeeId`, value)}
+                    >
                       <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="未選択" />
+                        <SelectValue placeholder="従業員を選択または未割り当て" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="general">本部/◯当て</SelectItem>
-                        <SelectItem value="supervisor">主任</SelectItem>
-                        <SelectItem value="manager">課長</SelectItem>
+                        <SelectItem value="">未割り当て</SelectItem>
+                        {employees.map((employee: any) => (
+                          <SelectItem key={employee.id} value={employee.id}>
+                            {employee.name} ({employee.department} - {employee.position})
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
+                    {errors.assignments?.[index]?.employeeId && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.assignments[index]?.employeeId?.message}
+                      </p>
+                    )}
                   </div>
 
-                  <div className="flex items-center space-x-2 mt-6">
-                    <Checkbox
-                      id={`manager-${index}`}
-                      {...register(`assignments.${index}.isManager`)}
-                    />
-                    <Label htmlFor={`manager-${index}`} className="text-sm">
-                      管理者として割り当て
-                    </Label>
+                  {/* 役職と管理者設定 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm text-gray-600">役職</Label>
+                      <Select
+                        value={watch(`assignments.${index}.role`) || ''}
+                        onValueChange={(value) => setValue(`assignments.${index}.role`, value)}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="役職を選択" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="worker">作業員</SelectItem>
+                          <SelectItem value="leader">リーダー</SelectItem>
+                          <SelectItem value="supervisor">主任</SelectItem>
+                          <SelectItem value="manager">課長</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex items-center space-x-2 mt-6">
+                      <Checkbox
+                        id={`manager-${index}`}
+                        {...register(`assignments.${index}.isManager`)}
+                      />
+                      <Label htmlFor={`manager-${index}`} className="text-sm">
+                        管理者として割り当て
+                      </Label>
+                    </div>
+                  </div>
+
+                  {/* 集合場所設定 */}
+                  <div>
+                    <Label className="text-sm text-gray-600">集合場所</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-1">
+                      <div>
+                        <Select
+                          value={watch(`assignments.${index}.gatheringPlace`) || ''}
+                          onValueChange={(value) => setValue(`assignments.${index}.gatheringPlace`, value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="集合場所を選択" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="site">現場</SelectItem>
+                            <SelectItem value="office">事務所</SelectItem>
+                            <SelectItem value="nearby">現場近隣</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {watch(`assignments.${index}.gatheringPlace`) === 'nearby' && (
+                        <div>
+                          <Input
+                            placeholder="近隣の住所を入力"
+                            {...register(`assignments.${index}.gatheringAddress`)}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
+
+            {totalRequiredPersons === 0 && (
+              <div className="text-center py-4 text-gray-500">
+                時間帯に必要人数を設定すると、担当者割り当て欄が表示されます
+              </div>
+            )}
           </div>
 
-          {/* 集合場所 */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700 mb-3 block">集合場所 (収集員 1)</Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm text-gray-600">区分</Label>
-                <Select>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="未選択" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="office">事務所</SelectItem>
-                    <SelectItem value="site">現場</SelectItem>
-                    <SelectItem value="other">その他</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-sm text-gray-600">住所</Label>
-                <Input
-                  placeholder="種別を選択"
-                  {...register('meetingPoint')}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-          </div>
 
           {/* 繰り返し設定 */}
           <div>
@@ -540,28 +594,50 @@ export function FieldworkScheduleForm({
                   </div>
 
                   {watch('isRecurring') && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
                       <div>
-                        <Label className="text-sm text-gray-600">繰り返しパターン</Label>
-                        <Select>
-                          <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="選択してください" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="daily">毎日</SelectItem>
-                            <SelectItem value="weekly">毎週</SelectItem>
-                            <SelectItem value="monthly">毎月</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Label className="text-sm text-gray-600 mb-3 block">繰り返す曜日（複数選択可）</Label>
+                        <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+                          {[
+                            { id: 'monday', label: '月' },
+                            { id: 'tuesday', label: '火' },
+                            { id: 'wednesday', label: '水' },
+                            { id: 'thursday', label: '木' },
+                            { id: 'friday', label: '金' },
+                            { id: 'saturday', label: '土' },
+                            { id: 'sunday', label: '日' },
+                          ].map((day) => (
+                            <div key={day.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`day-${day.id}`}
+                                checked={watch('recurringDays')?.includes(day.id) || false}
+                                onCheckedChange={(checked) => {
+                                  const currentDays = watch('recurringDays') || [];
+                                  if (checked) {
+                                    setValue('recurringDays', [...currentDays, day.id]);
+                                  } else {
+                                    setValue('recurringDays', currentDays.filter(d => d !== day.id));
+                                  }
+                                }}
+                              />
+                              <Label htmlFor={`day-${day.id}`} className="text-sm">
+                                {day.label}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
                       <div>
-                        <Label className="text-sm text-gray-600">終了日</Label>
+                        <Label className="text-sm text-gray-600">繰り返し終了日</Label>
                         <Input
                           type="date"
                           {...register('recurringEnd')}
                           className="mt-1"
                         />
+                        <p className="text-xs text-gray-500 mt-1">
+                          この日まで繰り返し予定を作成します
+                        </p>
                       </div>
                     </div>
                   )}

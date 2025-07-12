@@ -228,18 +228,19 @@ model ScheduleTimeSlot {
 model ScheduleAssignment {
   id          String   @id @default(cuid())
   scheduleId  String
-  employeeId  String
-  role        String   // '担当者', '責任者', '管理者'
+  employeeId  String?  // 未割り当て可能
+  role        String?  // '作業員', 'リーダー', '主任', '課長'
   isManager   Boolean  @default(false) // 管理者として割り当て
+  gatheringPlace String? // 集合場所 ('site', 'office', 'nearby')
+  gatheringAddress String? // 集合場所が'nearby'の場合の住所
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   // リレーション
   schedule    Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
-  employee    Employee @relation(fields: [employeeId], references: [id])
+  employee    Employee? @relation(fields: [employeeId], references: [id])
   
-  @@unique([scheduleId, employeeId])
   @@map("schedule_assignments")
 }
 

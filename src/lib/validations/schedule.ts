@@ -26,9 +26,11 @@ export const timeSlotSchema = z.object({
 
 // 担当者割り当てスキーマ
 export const assignmentSchema = z.object({
-  employeeId: z.string().min(1, '担当者を選択してください'),
-  role: z.string().min(1, '役職を選択してください'),
+  employeeId: z.string().optional(), // 未割り当て可能
+  role: z.string().optional(),
   isManager: z.boolean().default(false),
+  gatheringPlace: z.string().optional(), // 集合場所
+  gatheringAddress: z.string().optional(), // 集合場所が「近隣」の場合の住所
 });
 
 // 現場予定追加フォームスキーマ
@@ -59,7 +61,7 @@ export const fieldworkScheduleSchema = z.object({
   
   // 繰り返し設定
   isRecurring: z.boolean().default(false),
-  recurringPattern: z.enum(['daily', 'weekly', 'monthly']).optional(),
+  recurringDays: z.array(z.string()).optional(), // ['monday', 'tuesday', etc.]
   recurringEnd: z.string().optional(),
   
   // その他
