@@ -1,14 +1,24 @@
 {
   "name": "schedule-management-app",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Modern schedule management system built with Next.js 15, TypeScript, and Prisma",
   "private": true,
+  "author": "Schedule Management Team",
+  "keywords": ["next.js", "typescript", "prisma", "schedule", "management", "react"],
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0 --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test:api": "node scripts/test-api.js"
+    "test:api": "node scripts/test-api.js",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset",
+    "db:seed": "prisma db seed",
+    "clean": "rm -rf .next out",
+    "check": "npm run typecheck && npm run lint"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.24.0",
