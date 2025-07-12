@@ -34,7 +34,7 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
     queryKey: ['customer', id],
     queryFn: async () => {
       const response = await apiClient.get(`/customers/${id}`);
-      return response.data as Customer;
+      return response.data.data as Customer;
     },
   });
 

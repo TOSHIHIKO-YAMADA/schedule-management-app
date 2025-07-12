@@ -68,7 +68,7 @@ export function CustomerForm({ customerId, customer: providedCustomer, onSuccess
     queryKey: ['customer', customerId],
     queryFn: async () => {
       const response = await apiClient.get(`/customers/${customerId}`);
-      return response.data as Customer;
+      return response.data.data as Customer;
     },
     enabled: isEdit && !providedCustomer,
   });

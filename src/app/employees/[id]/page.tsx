@@ -34,7 +34,7 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
     queryKey: ['employee', id],
     queryFn: async () => {
       const response = await apiClient.get(`/employees/${id}`);
-      return response.data as Employee;
+      return response.data.data as Employee;
     },
   });
 
