@@ -57,7 +57,7 @@ export default function EmployeesPage() {
     queryKey: ['employees'],
     queryFn: async () => {
       const response = await apiClient.get('/employees');
-      return response.data;
+      return response.data.data;
     },
   });
 

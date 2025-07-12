@@ -1,33 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { createEmployeeSchema } from '@/lib/validations/employee';
-import { ZodError } from 'zod';
+import { z } from 'zod';
+import prisma from '@/lib/prisma';
+import { 
+  createSuccessResponse, 
+  createErrorResponse, 
+  withErrorHandling,
+  validateRequestBody,
+  validateEntityExists,
+  HTTP_STATUS 
+} from '@/lib/api-utils';
+import { withAuth, isAdmin, isSuperAdmin } from '@/lib/auth-utils';
+
+// バリデーションスキーマ
+const createEmployeeSchema = z.object({
+  name: z.string().min(1, '氏名は必須です'),
+  nameKana: z.string().min(1, 'ふりがなは必須です'),
+  email: z.string().email('有効なメールアドレスを入力してください'),
+  phone: z.string().min(1, '電話番号は必須です'),
+  lineId: z.string().optional(),
+  notificationMethod: z.enum(['email', 'line', 'both']).default('email'),
+  department: z.string().min(1, '所属は必須です'),
+  position: z.string().min(1, '役職は必須です'),
+  nearestStation: z.string().min(1, '最寄り駅は必須です'),
+  transportation: z.enum(['train', 'car', 'bicycle', 'walk', 'bus']).default('train'),
+  status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
+});
 
 // GET /api/employees - 従業員一覧取得
-export async function GET() {
-  try {
+export const GET = withErrorHandling(async (request: NextRequest) => {
+  return withAuth(request, async (request, user) => {
     const employees = await prisma.employee.findMany({
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return NextResponse.json(employees);
-  } catch (error) {
-    console.error('Failed to fetch employees:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch employees' },
-      { status: 500 }
-    );
-  }
-}
+    return createSuccessResponse(employees);
+  });
+});
 
 // POST /api/employees - 新規従業員作成
-export async function POST(request: NextRequest) {
-  try {
+export const POST = withErrorHandling(async (request: NextRequest) => {
+  return withAuth(request, async (request, user) => {
     const body = await request.json();
-    
-    // バリデーション
     const validatedData = createEmployeeSchema.parse(body);
 
     // メールアドレスの重複チェック
@@ -36,9 +51,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingEmployee) {
-      return NextResponse.json(
-        { error: 'このメールアドレスは既に使用されています' },
-        { status: 409 }
+      return createErrorResponse(
+        'メールアドレスが既に使用されています',
+        HTTP_STATUS.BAD_REQUEST
       );
     }
 
@@ -46,42 +61,32 @@ export async function POST(request: NextRequest) {
       data: validatedData,
     });
 
-    return NextResponse.json(employee, { status: 201 });
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
-      );
-    }
-
-    console.error('Failed to create employee:', error);
-    return NextResponse.json(
-      { error: 'Failed to create employee' },
-      { status: 500 }
+    return createSuccessResponse(
+      employee,
+      '従業員が作成されました'
     );
-  }
-}
+  });
+});
 
 // DELETE /api/employees - 一括削除
-export async function DELETE(request: NextRequest) {
-  try {
+export const DELETE = withErrorHandling(async (request: NextRequest) => {
+  return withAuth(request, async (request, user) => {
     const body = await request.json();
     const { ids } = body;
 
     // IDs配列の検証
     if (!Array.isArray(ids) || ids.length === 0) {
-      return NextResponse.json(
-        { error: '削除対象のIDが指定されていません' },
-        { status: 400 }
+      return createErrorResponse(
+        '削除対象のIDが指定されていません',
+        HTTP_STATUS.BAD_REQUEST
       );
     }
 
     // すべてのIDが文字列かチェック
     if (!ids.every(id => typeof id === 'string')) {
-      return NextResponse.json(
-        { error: '無効なIDが含まれています' },
-        { status: 400 }
+      return createErrorResponse(
+        '無効なIDが含まれています',
+        HTTP_STATUS.BAD_REQUEST
       );
     }
 
@@ -94,15 +99,9 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      message: `${result.count}件の従業員データを削除しました`,
-      count: result.count,
-    });
-  } catch (error) {
-    console.error('Failed to delete employees:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete employees' },
-      { status: 500 }
+    return createSuccessResponse(
+      { count: result.count },
+      `${result.count}件の従業員データを削除しました`
     );
-  }
-}
+  });
+});
