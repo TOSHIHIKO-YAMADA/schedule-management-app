@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Upload, FileText, AlertCircle, CheckCircle, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useMutation } from '@tanstack/react-query';
+import { Upload, X, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -12,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api-client';
 
 interface ImportDialogProps {
@@ -21,24 +21,22 @@ interface ImportDialogProps {
 }
 
 interface ImportResult {
-  message: string;
-  imported: number;
-  duplicates?: number;
-  errors?: string[];
+  success: number;
+  failed: number;
+  errors: string[];
 }
 
 export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const queryClient = useQueryClient();
 
   const importMutation = useMutation({
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await apiClient.post('/employees/import', formData, {
+      const response = await apiClient.post('/customers/import', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -46,7 +44,6 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
       return response.data as ImportResult;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['employees'] });
       setSelectedFile(null);
       onSuccess?.();
       
@@ -54,12 +51,12 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
       onOpenChange(false);
       
       // 結果メッセージを表示
-      let message = data.message;
-      if (data.duplicates && data.duplicates > 0) {
-        message += `\n（${data.duplicates}件の重複データをスキップしました）`;
+      let message = `${data.success}件の顧客データをインポートしました`;
+      if (data.failed > 0) {
+        message += `\n（${data.failed}件の失敗がありました）`;
       }
       if (data.errors && data.errors.length > 0) {
-        message += `\n\nエラー:\n${data.errors.join('\n')}`;
+        message += `\n\nエラー:\n${data.errors.slice(0, 5).join('\n')}`;
       }
       alert(message);
     },
@@ -127,10 +124,10 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5 text-blue-600" />
-            従業員データをインポート
+            顧客データをインポート
           </DialogTitle>
           <DialogDescription>
-            CSVファイルを選択して従業員データを一括で追加できます
+            CSVファイルを選択して顧客データを一括で追加できます
           </DialogDescription>
         </DialogHeader>
         
@@ -190,7 +187,7 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
                 <ul className="text-xs space-y-1 list-disc list-inside">
                   <li>ID、作成日、更新日は自動生成されるため入力不要です</li>
                   <li>既存のメールアドレスと重複するデータはスキップされます</li>
-                  <li>必須項目: 氏名、ふりがな、メールアドレス、所属、最寄り駅</li>
+                  <li>必須項目: 会社名、住所、電話番号、担当者名、メールアドレス</li>
                   <li>サンプルファイルを参考に正しい形式で作成してください</li>
                 </ul>
               </div>
@@ -201,7 +198,7 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
         <DialogFooter className="flex items-center justify-between">
           <Button
             variant="outline"
-            onClick={() => window.open('/api/employees/sample', '_blank')}
+            onClick={() => window.open('/api/customers/sample', '_blank')}
             className="flex items-center gap-2"
           >
             <FileText className="h-4 w-4" />

@@ -51,13 +51,6 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
 
     const customers = await prisma.customer.findMany({
       where,
-      include: {
-        _count: {
-          select: {
-            schedules: true,
-          },
-        },
-      },
       orderBy: {
         name: 'asc',
       },

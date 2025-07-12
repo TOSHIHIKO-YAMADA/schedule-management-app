@@ -143,6 +143,7 @@ export async function POST(request: NextRequest) {
           lineId,
           notificationMethod,
           department,
+          position: '一般', // デフォルト役職
           nearestStation,
           transportation,
           status

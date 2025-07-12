@@ -1,54 +1,36 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { Employee } from '@prisma/client';
+import { Customer } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
-import { Mail, Phone, MoreHorizontal, ArrowUpDown, Edit, Trash2, Eye } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Mail, Phone, Globe, ArrowUpDown, Building2 } from 'lucide-react';
 
-// 従業員の名前からイニシャルを生成するヘルパー関数
-const getInitials = (name: string) => {
-  if (!name) return '?';
-  const names = name.split(' ');
-  if (names.length === 0) return '?';
-  const firstInitial = names[0][0] || '';
-  const lastInitial = names.length > 1 ? names[names.length - 1][0] || '' : '';
-  return `${firstInitial}${lastInitial}`.toUpperCase();
-};
-
-interface EmployeeTableColumnsProps {
-  onDelete: (employee: Employee) => void;
-  onRowClick: (employee: Employee) => void;
-  selectedEmployeeIds: Set<string>;
-  onSelectEmployee: (employeeId: string, checked: boolean) => void;
+interface CustomerTableColumnsProps {
+  onDelete: (customer: Customer) => void;
+  onRowClick: (customer: Customer) => void;
+  selectedCustomerIds: Set<string>;
+  onSelectCustomer: (customerId: string, checked: boolean) => void;
   onSelectAll: (checked: boolean) => void;
-  allEmployees: Employee[];
+  allCustomers: Customer[];
 }
 
-export const createEmployeeTableColumns = ({
+export const createCustomerTableColumns = ({
   onDelete,
   onRowClick,
-  selectedEmployeeIds,
-  onSelectEmployee,
+  selectedCustomerIds,
+  onSelectCustomer,
   onSelectAll,
-  allEmployees,
-}: EmployeeTableColumnsProps): ColumnDef<Employee>[] => [
+  allCustomers,
+}: CustomerTableColumnsProps): ColumnDef<Customer>[] => [
   {
     id: 'select',
     header: ({ table }) => {
-      const isAllSelected = allEmployees.length > 0 && 
-        allEmployees.every(emp => selectedEmployeeIds.has(emp.id));
+      const isAllSelected = allCustomers.length > 0 && 
+        allCustomers.every(cust => selectedCustomerIds.has(cust.id));
       const isIndeterminate = !isAllSelected && 
-        allEmployees.some(emp => selectedEmployeeIds.has(emp.id));
+        allCustomers.some(cust => selectedCustomerIds.has(cust.id));
 
       return (
         <div className="flex items-center">
@@ -66,15 +48,15 @@ export const createEmployeeTableColumns = ({
       );
     },
     cell: ({ row }) => {
-      const employee = row.original;
-      const isSelected = selectedEmployeeIds.has(employee.id);
+      const customer = row.original;
+      const isSelected = selectedCustomerIds.has(customer.id);
 
       return (
         <div className="flex items-center">
           <input
             type="checkbox"
             checked={isSelected}
-            onChange={(e) => onSelectEmployee(employee.id, e.target.checked)}
+            onChange={(e) => onSelectCustomer(customer.id, e.target.checked)}
             className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             suppressHydrationWarning
           />
@@ -93,27 +75,46 @@ export const createEmployeeTableColumns = ({
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="hover:bg-transparent p-0 h-auto font-medium"
         >
-          従業員
+          顧客名
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
     cell: ({ row }) => {
-      const employee = row.original;
+      const customer = row.original;
       return (
         <div 
           className="flex items-center space-x-4 cursor-pointer py-2" 
-          onClick={() => onRowClick(employee)}
+          onClick={() => onRowClick(customer)}
         >
           <Avatar 
             size="md"
             src=""
-            alt={employee.name}
-            fallback={getInitials(employee.name)}
+            alt={customer.name}
+            fallback={<Building2 className="h-5 w-5" />}
           />
           <div className="flex flex-col">
-            <span className="font-medium text-gray-900">{employee.name}</span>
-            <span className="text-sm text-gray-500">{employee.nameKana}</span>
+            <span className="font-medium text-gray-900">{customer.name}</span>
+            {customer.industry && (
+              <span className="text-sm text-gray-500">{customer.industry}</span>
+            )}
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'contactPerson',
+    header: '担当者',
+    cell: ({ row }) => {
+      const customer = row.original;
+      return (
+        <div 
+          className="cursor-pointer py-2" 
+          onClick={() => onRowClick(customer)}
+        >
+          <div className="font-medium text-gray-900 text-sm">
+            {row.getValue('contactPerson')}
           </div>
         </div>
       );
@@ -123,20 +124,24 @@ export const createEmployeeTableColumns = ({
     accessorKey: 'email',
     header: '連絡先',
     cell: ({ row }) => {
-      const employee = row.original;
+      const customer = row.original;
       return (
         <div 
           className="space-y-2 cursor-pointer py-2" 
-          onClick={() => onRowClick(employee)}
+          onClick={() => onRowClick(customer)}
         >
           <div className="flex items-center gap-2 text-sm text-gray-900">
             <Mail className="h-4 w-4 text-blue-500" />
-            <span className="truncate max-w-48">{employee.email}</span>
+            <span className="truncate max-w-48">{customer.email}</span>
           </div>
-          {employee.phone && (
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Phone className="h-4 w-4 text-green-500" />
+            <span>{customer.phone}</span>
+          </div>
+          {customer.website && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Phone className="h-4 w-4 text-green-500" />
-              <span>{employee.phone}</span>
+              <Globe className="h-4 w-4 text-purple-500" />
+              <span className="truncate max-w-48">{customer.website}</span>
             </div>
           )}
         </div>
@@ -144,33 +149,32 @@ export const createEmployeeTableColumns = ({
     },
   },
   {
-    accessorKey: 'department',
-    header: '所属部署',
+    accessorKey: 'address',
+    header: '住所',
     cell: ({ row }) => {
-      const employee = row.original;
+      const customer = row.original;
       return (
         <div 
           className="cursor-pointer py-2" 
-          onClick={() => onRowClick(employee)}
+          onClick={() => onRowClick(customer)}
         >
-          <div className="font-medium text-gray-900 text-sm">
-            {row.getValue('department')}
+          <div className="text-sm text-gray-900 max-w-xs truncate">
+            {row.getValue('address')}
           </div>
         </div>
       );
     },
   },
   {
-    accessorKey: 'status',
+    accessorKey: 'isActive',
     header: 'ステータス',
     cell: ({ row }) => {
-      const employee = row.original;
-      const status = row.getValue('status') as string;
-      const isActive = status === 'ACTIVE';
+      const customer = row.original;
+      const isActive = row.getValue('isActive') as boolean;
       return (
         <div 
           className="cursor-pointer py-2" 
-          onClick={() => onRowClick(employee)}
+          onClick={() => onRowClick(customer)}
         >
           <Badge variant={isActive ? 'success' : 'inactive'}>
             {isActive ? 'アクティブ' : '非アクティブ'}

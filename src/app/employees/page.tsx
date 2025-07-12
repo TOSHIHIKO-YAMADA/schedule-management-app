@@ -65,8 +65,11 @@ export default function EmployeesPage() {
   const filteredEmployees = employees.filter((employee: Employee) => {
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = 
+      searchTerm === '' || // 検索文字列が空の場合は全件表示
       employee.name.toLowerCase().includes(searchLower) ||
-      employee.email.toLowerCase().includes(searchLower);
+      employee.nameKana.toLowerCase().includes(searchLower) ||
+      employee.email.toLowerCase().includes(searchLower) ||
+      employee.department.toLowerCase().includes(searchLower);
     
     const matchesDepartment = departmentFilter === 'all' || employee.department === departmentFilter;
     const matchesStatus = statusFilter === 'all' || employee.status === statusFilter;
@@ -341,7 +344,7 @@ export default function EmployeesPage() {
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <Input
-                  placeholder="従業員名、メールアドレス、部署で検索..."
+                  placeholder="従業員名、ふりがな、メールアドレス、部署で検索..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-12 h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg text-base shadow-sm"

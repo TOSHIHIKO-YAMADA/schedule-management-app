@@ -26,3 +26,19 @@ model Employee {
   @@map("employees")
 }
 
+model Customer {
+  id            String   @id @default(cuid())
+  name          String
+  address       String
+  phone         String
+  contactPerson String
+  email         String
+  website       String?
+  industry      String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("customers")
+}
+

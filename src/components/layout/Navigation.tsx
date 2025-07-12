@@ -5,12 +5,13 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useTheme } from "next-themes";
 import { useUser, UserButton } from "@clerk/nextjs";
-import { Calendar, Home, Settings, Plus, Menu, X, Sun, Moon, LogIn, Users } from "lucide-react";
+import { Calendar, Home, Settings, Plus, Menu, X, Sun, Moon, LogIn, Users, Building2 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "ダッシュボード", icon: Home },
   { href: "/schedules", label: "スケジュール", icon: Calendar },
   { href: "/employees", label: "従業員管理", icon: Users },
+  { href: "/customers", label: "顧客管理", icon: Building2 },
   { href: "/settings", label: "設定", icon: Settings },
 ];
 

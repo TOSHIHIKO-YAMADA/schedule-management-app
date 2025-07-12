@@ -27,6 +27,10 @@ export const API_PERMISSIONS = {
   'POST /api/customers': ['limited_admin', 'admin', 'super'],
   'PUT /api/customers': ['limited_admin', 'admin', 'super'],
   'DELETE /api/customers': ['admin', 'super'],
+  'GET /api/customers/export': ['general'],
+  'POST /api/customers/import': ['admin', 'super'],
+  'GET /api/customers/sample': ['general'],
+  'POST /api/customers/seed': ['super'],
 
   // 車両管理
   'GET /api/vehicles': ['general'],
@@ -60,29 +64,14 @@ export async function getCurrentUser(request: NextRequest) {
   const skipAuth = process.env.SKIP_AUTH === 'true';
   
   if (isDevelopment && skipAuth) {
-    // 開発用：ヘッダーからユーザーIDを取得（必須）
-    const devUserId = request.headers.get('x-user-id');
-    
-    if (!devUserId) {
-      return null; // ヘッダーが無い場合は認証失敗
-    }
-    
-    try {
-      const user = await prisma.employee.findUnique({
-        where: { id: devUserId },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          isActive: true,
-        },
-      });
-      return user;
-    } catch (error) {
-      console.error('開発用ユーザー取得エラー:', error);
-      return null;
-    }
+    // 開発用：ダミーユーザーを返す
+    return {
+      id: 'dev-user-id',
+      name: '開発ユーザー',
+      email: 'dev@example.com',
+      role: 'super',
+      isActive: true,
+    };
   }
 
   // 本番環境またはClerk認証有効時

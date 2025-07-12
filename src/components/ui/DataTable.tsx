@@ -101,8 +101,9 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row, index) => {
-                const employee = row.original as any;
-                const isInactive = employee?.status === 'INACTIVE';
+                const data = row.original as any;
+                // 従業員の場合はstatus、顧客の場合はisActiveで判定
+                const isInactive = data?.status === 'INACTIVE' || data?.isActive === false;
                 const isSelected = row.getIsSelected();
                 const isEven = index % 2 === 0;
                 
