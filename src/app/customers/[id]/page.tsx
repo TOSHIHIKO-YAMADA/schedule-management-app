@@ -58,7 +58,7 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
   const isActive = customer?.isActive;
 
   // 詳細表示コンテンツ
-  const detailContent = (
+  const detailContent = customer ? (
     <div className="space-y-8">
       {/* 基本情報表示セクション */}
       <DetailSection icon={Building2} title="基本情報" subtitle="顧客の基本的な情報">
@@ -142,16 +142,16 @@ export default function CustomerDetailPage({ params }: CustomerDetailPageProps) 
       {/* メタ情報 */}
       <MetaInfo createdAt={customer.createdAt} updatedAt={customer.updatedAt} />
     </div>
-  );
+  ) : null;
 
   // 編集コンテンツ
-  const editContent = (
+  const editContent = customer ? (
     <CustomerForm 
       customer={customer}
       onSuccess={handleSuccess}
       onCancel={handleCancel}
     />
-  );
+  ) : null;
 
   return (
     <EntityDetailLayout

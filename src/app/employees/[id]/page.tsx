@@ -94,7 +94,7 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
   const isActive = employee?.status === 'ACTIVE';
 
   // 詳細表示コンテンツ
-  const detailContent = (
+  const detailContent = employee ? (
     <div className="space-y-8">
       {/* 基本情報表示セクション */}
       <DetailSection icon={User} title="基本情報" subtitle="従業員の基本的な情報">
@@ -168,16 +168,16 @@ export default function EmployeeDetailPage({ params }: EmployeeDetailPageProps) 
       {/* メタ情報 */}
       <MetaInfo createdAt={employee.createdAt} updatedAt={employee.updatedAt} />
     </div>
-  );
+  ) : null;
 
   // 編集コンテンツ
-  const editContent = (
+  const editContent = employee ? (
     <EmployeeForm 
       employee={employee}
       onSuccess={handleSuccess}
       onCancel={handleCancel}
     />
-  );
+  ) : null;
 
   return (
     <EntityDetailLayout
