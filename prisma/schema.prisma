@@ -20,8 +20,19 @@ model Employee {
   nearestStation    String
   transportation    String   @default("train")
   status            String   @default("ACTIVE")
+  role              String   @default("general") // super, admin, limited_admin, general
+  clerkId           String?  @unique // Clerk認証との連携用
+  isActive          Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  // リレーション
+  schedules         Schedule[]
+  assignedTasks     Task[] @relation("TaskAssignee")
+  createdTasks      Task[] @relation("TaskCreator")
+  createdSchedules  Schedule[] @relation("ScheduleCreator")
+  responsibleSchedules Schedule[] @relation("ScheduleResponsible")
+  scheduleAssignments ScheduleAssignment[]
 
   @@map("employees")
 }
@@ -39,6 +50,193 @@ model Customer {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // リレーション
+  schedules     Schedule[]
+  tasks         Task[]
+
   @@map("customers")
+}
+
+model Vehicle {
+  id                String   @id @default(cuid())
+  name              String   // 車両名（例: "営業車1号", "配送トラック"）
+  licensePlate      String   @unique // ナンバープレート
+  model             String?  // 車種・型式
+  manufacturer      String?  // メーカー
+  year              Int?     // 年式
+  color             String?  // 色
+  fuelType          String   @default("gasoline") // 燃料タイプ（gasoline, diesel, electric, hybrid）
+  capacity          Int?     // 乗車定員
+  mileage           Float?   // 現在の走行距離（km）
+  
+  // 車検・保険情報
+  inspectionDate    DateTime? // 車検満了日
+  insuranceDate     DateTime? // 保険期限
+  
+  // 管理情報
+  isActive          Boolean  @default(true)
+  notes             String?  // 備考
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // リレーション
+  usageHistory      VehicleUsage[]
+  schedules         Schedule[]
+
+  @@map("vehicles")
+}
+
+model VehicleUsage {
+  id          String   @id @default(cuid())
+  vehicleId   String
+  employeeId  String
+  startDate   DateTime
+  endDate     DateTime?
+  purpose     String   // 使用目的
+  destination String?  // 行き先
+  startMileage Float?  // 開始時走行距離
+  endMileage   Float?  // 終了時走行距離
+  fuelAmount   Float?  // 給油量
+  fuelCost     Float?  // 給油代
+  notes        String? // 備考
+  status       String  @default("scheduled") // scheduled, in_use, completed, cancelled
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // リレーション
+  vehicle     Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  // employee    Employee @relation(fields: [employeeId], references: [id])
+
+  @@map("vehicle_usage")
+}
+
+// スケジュール管理
+model Schedule {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  allDay      Boolean  @default(false)
+  type        String   // 'work', 'vacation', 'meeting', 'maintenance', 'appointment', 'fieldwork'
+  status      String   @default("scheduled") // scheduled, completed, cancelled
+  location    String?  // 場所
+  address     String?  // 住所（現場住所）
+  
+  // 現場作業関連
+  siteName    String?  // 現場名
+  requiredPersons Int?  // 必要人数
+  responsibleId String? // 責任者ID
+  meetingPoint String?  // 集合場所
+  meetingCategory String? // 集合場所区分
+  
+  // 資機材
+  equipment   String?  // JSON形式で資機材リストを保存
+  
+  // 関連エンティティ
+  employeeId  String
+  customerId  String?  // 顧客関連の場合
+  vehicleId   String?  // 車両関連の場合
+  
+  // 繰り返し設定
+  isRecurring Boolean  @default(false)
+  recurringPattern String? // 'daily', 'weekly', 'monthly'
+  recurringEnd DateTime?
+  parentScheduleId String? // 繰り返しスケジュールの親ID
+  canDuplicate Boolean @default(false) // 複製可能フラグ
+  
+  // 通知設定
+  reminderMinutes Int?  // 何分前に通知するか
+  
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // リレーション
+  employee    Employee @relation(fields: [employeeId], references: [id])
+  customer    Customer? @relation(fields: [customerId], references: [id])
+  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
+  creator     Employee @relation("ScheduleCreator", fields: [createdBy], references: [id])
+  responsible Employee? @relation("ScheduleResponsible", fields: [responsibleId], references: [id])
+  
+  // 子スケジュール（繰り返しの場合）
+  childSchedules Schedule[] @relation("ScheduleRecurrence")
+  parentSchedule Schedule? @relation("ScheduleRecurrence", fields: [parentScheduleId], references: [id])
+  
+  // 時間帯管理
+  timeSlots   ScheduleTimeSlot[]
+  // 担当者割り当て
+  assignments ScheduleAssignment[]
+
+  @@map("schedules")
+}
+
+// タスク管理
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  dueDate     DateTime?
+  priority    String   @default("medium") // high, medium, low
+  status      String   @default("pending") // pending, in_progress, completed, cancelled
+  tags        String?  // カンマ区切りのタグ
+  estimatedHours Float? // 予想作業時間
+  actualHours    Float? // 実際の作業時間
+  
+  // 関連エンティティ
+  assignedTo  String
+  createdBy   String
+  customerId  String?  // 顧客関連タスクの場合
+  
+  // 通知設定
+  reminderDate DateTime? // リマインダー日時
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  completedAt DateTime? // 完了日時
+  
+  // リレーション
+  assignee    Employee @relation("TaskAssignee", fields: [assignedTo], references: [id])
+  creator     Employee @relation("TaskCreator", fields: [createdBy], references: [id])
+  customer    Customer? @relation(fields: [customerId], references: [id])
+
+  @@map("tasks")
+}
+
+// スケジュールの時間帯管理（動的に追加可能）
+model ScheduleTimeSlot {
+  id          String   @id @default(cuid())
+  scheduleId  String
+  startTime   DateTime
+  endTime     DateTime
+  requiredPersons Int @default(1)
+  order       Int      @default(1)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // リレーション
+  schedule    Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@map("schedule_time_slots")
+}
+
+// スケジュールの担当者割り当て
+model ScheduleAssignment {
+  id          String   @id @default(cuid())
+  scheduleId  String
+  employeeId  String
+  role        String   // '担当者', '責任者', '管理者'
+  isManager   Boolean  @default(false) // 管理者として割り当て
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // リレーション
+  schedule    Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  employee    Employee @relation(fields: [employeeId], references: [id])
+  
+  @@unique([scheduleId, employeeId])
+  @@map("schedule_assignments")
 }
 

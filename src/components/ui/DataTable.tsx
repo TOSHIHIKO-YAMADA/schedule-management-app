@@ -28,6 +28,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   searchKey?: string;
   isLoading?: boolean;
+  onRowClick?: (row: TData) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -35,6 +36,7 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   isLoading = false,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -112,7 +114,7 @@ export function DataTable<TData, TValue>({
                     key={row.id}
                     data-state={isSelected && "selected"}
                     className={`
-                      transition-colors duration-200 border-b
+                      transition-colors duration-200 border-b cursor-pointer
                       ${
                         isSelected
                           ? "bg-blue-200 hover:bg-blue-300 border-blue-300"
@@ -121,6 +123,15 @@ export function DataTable<TData, TValue>({
                           : "bg-white hover:bg-blue-200"
                       }
                     `}
+                    onClick={(e) => {
+                      // チェックボックスクリック時は行クリックを無効化
+                      if ((e.target as HTMLElement).closest('input[type="checkbox"]')) {
+                        return;
+                      }
+                      if (onRowClick) {
+                        onRowClick(row.original);
+                      }
+                    }}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell 

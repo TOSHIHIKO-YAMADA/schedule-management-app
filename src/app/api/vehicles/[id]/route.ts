@@ -15,11 +15,17 @@ import { withAuth, isAdmin, isSuperAdmin } from '@/lib/auth-utils';
 const updateVehicleSchema = z.object({
   name: z.string().min(1, '車両名は必須です').optional(),
   licensePlate: z.string().min(1, 'ナンバープレートは必須です').optional(),
-  inspectionDate: z.string().min(1, '車検日は必須です').optional(),
-  type: z.enum(['sedan', 'van', 'truck']).optional(),
-  capacity: z.number().int().min(1, '乗車定員は1以上である必要があります').optional(),
-  fuelType: z.enum(['gasoline', 'diesel', 'hybrid', 'electric']).optional(),
+  model: z.string().optional(),
+  manufacturer: z.string().optional(),
+  year: z.number().min(1900).max(new Date().getFullYear() + 1).optional(),
+  color: z.string().optional(),
+  fuelType: z.enum(['gasoline', 'diesel', 'electric', 'hybrid']).optional(),
+  capacity: z.number().min(1).max(50).optional(),
+  mileage: z.number().min(0).optional(),
+  inspectionDate: z.string().transform((str) => str ? new Date(str) : undefined).optional(),
+  insuranceDate: z.string().transform((str) => str ? new Date(str) : undefined).optional(),
   isActive: z.boolean().optional(),
+  notes: z.string().optional(),
 });
 
 // GET /api/vehicles/[id] - 車両詳細取得
@@ -33,37 +39,14 @@ export const GET = withErrorHandling(async (
       include: {
         _count: {
           select: {
-            schedules: true,
-            vehicleUsages: true,
+            usageHistory: true,
           },
         },
-        schedules: {
-          where: {
-            status: { not: 'cancelled' },
-          },
-          select: {
-            id: true,
-            title: true,
-            startDate: true,
-            endDate: true,
-            status: true,
-            creator: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-            customer: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
+        usageHistory: {
+          take: 10,
           orderBy: {
             startDate: 'desc',
           },
-          take: 10,
         },
       },
     });
@@ -75,17 +58,26 @@ export const GET = withErrorHandling(async (
       );
     }
 
-    // 車検日の警告情報を追加
-    const inspectionDate = new Date(vehicle.inspectionDate);
+    // 車検日・保険の警告情報を追加
     const today = new Date();
-    const daysUntilInspection = Math.ceil((inspectionDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
     
     const vehicleWithWarning = {
       ...vehicle,
-      inspectionWarning: {
-        daysUntilInspection,
-        isExpired: daysUntilInspection < 0,
-        isExpiringSoon: daysUntilInspection <= 30 && daysUntilInspection >= 0,
+      alerts: {
+        inspection: vehicle.inspectionDate ? {
+          date: vehicle.inspectionDate,
+          isExpired: vehicle.inspectionDate < today,
+          isExpiringSoon: vehicle.inspectionDate <= thirtyDaysFromNow && vehicle.inspectionDate >= today,
+          daysUntilExpiry: Math.ceil((vehicle.inspectionDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
+        } : null,
+        insurance: vehicle.insuranceDate ? {
+          date: vehicle.insuranceDate,
+          isExpired: vehicle.insuranceDate < today,
+          isExpiringSoon: vehicle.insuranceDate <= thirtyDaysFromNow && vehicle.insuranceDate >= today,
+          daysUntilExpiry: Math.ceil((vehicle.insuranceDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
+        } : null,
       },
     };
 
@@ -108,12 +100,9 @@ export const PUT = withErrorHandling(async (
     });
 
     if (!existingVehicle) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: '車両が見つかりません',
-        },
-        { status: 404 }
+      return createErrorResponse(
+        '車両が見つかりません',
+        HTTP_STATUS.NOT_FOUND
       );
     }
 
@@ -127,12 +116,9 @@ export const PUT = withErrorHandling(async (
       });
 
       if (existingLicensePlate) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'ナンバープレートが既に使用されています',
-          },
-          { status: 400 }
+        return createErrorResponse(
+          'ナンバープレートが既に使用されています',
+          HTTP_STATUS.BAD_REQUEST
         );
       }
     }
@@ -163,53 +149,31 @@ export const DELETE = withErrorHandling(async (
       include: {
         _count: {
           select: {
-            schedules: true,
-            vehicleUsages: true,
-          },
-        },
-        schedules: {
-          where: {
-            status: { in: ['scheduled', 'in_progress'] },
+            usageHistory: true,
           },
         },
       },
     });
 
     if (!existingVehicle) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: '車両が見つかりません',
-        },
-        { status: 404 }
-      );
-    }
-
-    // アクティブなスケジュールがある場合は削除不可
-    if (existingVehicle.schedules.length > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'アクティブなスケジュールが存在するため削除できません',
-          details: `${existingVehicle.schedules.length}件のアクティブなスケジュールがあります`,
-        },
-        { status: 400 }
+      return createErrorResponse(
+        '車両が見つかりません',
+        HTTP_STATUS.NOT_FOUND
       );
     }
 
     // 関連データがある場合は論理削除
-    if (existingVehicle._count.schedules > 0 || existingVehicle._count.vehicleUsages > 0) {
+    if (existingVehicle._count.usageHistory > 0) {
       // 論理削除（isActiveをfalseに設定）
       const deactivatedVehicle = await prisma.vehicle.update({
         where: { id: params.id },
         data: { isActive: false },
       });
 
-      return NextResponse.json({
-        success: true,
-        data: deactivatedVehicle,
-        message: '車両を無効化しました（関連データがあるため物理削除は行われませんでした）',
-      });
+      return createSuccessResponse(
+        deactivatedVehicle,
+        '車両を無効化しました（使用履歴があるため物理削除は行われませんでした）'
+      );
     } else {
       // 物理削除
       await prisma.vehicle.delete({

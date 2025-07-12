@@ -224,16 +224,16 @@ export default function CustomersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-100 to-indigo-100">
       <div className="container mx-auto px-6 py-8 max-w-7xl">
         {/* ヘッダーセクション */}
         <div className="mb-8 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-indigo-600/5 rounded-2xl blur-3xl"></div>
-          <div className="relative bg-gradient-to-r from-white via-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-r from-green-600/5 to-blue-600/5 rounded-2xl blur-3xl"></div>
+          <div className="relative bg-gradient-to-r from-white via-green-50 to-blue-50 border-2 border-green-200 rounded-2xl p-6 shadow-2xl">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
@@ -249,7 +249,7 @@ export default function CustomersPage() {
               <div className="flex items-center gap-3">
               <Button 
                 onClick={handleNewCustomer}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
+                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-6 py-3 font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 新規登録
@@ -332,7 +332,7 @@ export default function CustomersPage() {
         </div>
 
         {/* フィルター・検索セクション */}
-        <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-pink-200 rounded-xl shadow-lg p-6 mb-6">
+        <div className="bg-gradient-to-r from-teal-50 to-green-50 border-2 border-teal-200 rounded-xl shadow-lg p-6 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -341,7 +341,7 @@ export default function CustomersPage() {
                   placeholder="顧客名、メールアドレス、担当者名で検索..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg text-base shadow-sm"
+                  className="pl-12 h-12 bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-lg text-base shadow-sm"
                 />
               </div>
             </div>
@@ -380,17 +380,17 @@ export default function CustomersPage() {
 
           {/* 選択状態とアクション */}
           {selectedCustomerIds.size > 0 && (
-            <div className="px-6 py-4 bg-blue-50 border-b border-blue-100">
+            <div className="px-6 py-4 bg-green-50 border-b border-green-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-blue-700">
+                  <span className="text-sm font-medium text-green-700">
                     {selectedCustomerIds.size}件を選択中
                   </span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setSelectedCustomerIds(new Set())}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-green-600 hover:text-green-800"
                   >
                     選択解除
                   </Button>

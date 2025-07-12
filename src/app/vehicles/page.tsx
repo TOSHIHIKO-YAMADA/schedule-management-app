@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Trash2, MoreHorizontal, Upload, Download, FileText, TestTube } from 'lucide-react';
-import { Employee } from '@prisma/client';
+import { Plus, Search, Trash2, MoreHorizontal, AlertTriangle, Car, FileText, TestTube } from 'lucide-react';
+import { Vehicle } from '@prisma/client';
 import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,144 +22,124 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-// import {
-//   AlertDialog,
-//   AlertDialogAction,
-//   AlertDialogCancel,
-//   AlertDialogContent,
-//   AlertDialogDescription,
-//   AlertDialogFooter,
-//   AlertDialogHeader,
-//   AlertDialogTitle,
-// } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { DeleteEmployeeDialog } from '@/components/employees/DeleteEmployeeDialog';
-import { ImportDialog } from '@/components/employees/ImportDialog';
-import { createEmployeeTableColumns } from '@/components/employees/EmployeeTableColumns';
+import { createVehicleTableColumns } from '@/components/vehicles/VehicleTableColumns';
+import { DeleteVehicleDialog } from '@/components/vehicles/DeleteVehicleDialog';
 import { apiClient } from '@/lib/api-client';
 
-export default function EmployeesPage() {
+interface VehicleWithAlerts extends Vehicle {
+  inspectionAlert?: boolean;
+  insuranceAlert?: boolean;
+  _count: {
+    usageHistory: number;
+  };
+}
+
+export default function VehiclesPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
-  const [departmentFilter, setDepartmentFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [fuelTypeFilter, setFuelTypeFilter] = useState<string>('all');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Set<string>>(new Set());
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [selectedVehicleIds, setSelectedVehicleIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // APIからデータを取得
-  const { data: employees = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['employees'],
+  const { data: vehicles = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['vehicles', searchTerm, statusFilter, fuelTypeFilter],
     queryFn: async () => {
-      const response = await apiClient.get('/employees');
-      return response.data.data;
+      const params = new URLSearchParams();
+      if (searchTerm) params.set('search', searchTerm);
+      if (statusFilter !== 'all') params.set('status', statusFilter);
+      if (fuelTypeFilter !== 'all') params.set('fuelType', fuelTypeFilter);
+      
+      const response = await apiClient.get(`/vehicles?${params.toString()}`);
+      return response.data.data as VehicleWithAlerts[];
     },
   });
 
-  // 検索・フィルタリング
-  const filteredEmployees = employees.filter((employee: Employee) => {
-    const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = 
-      searchTerm === '' || // 検索文字列が空の場合は全件表示
-      employee.name.toLowerCase().includes(searchLower) ||
-      employee.nameKana.toLowerCase().includes(searchLower) ||
-      employee.email.toLowerCase().includes(searchLower) ||
-      employee.department.toLowerCase().includes(searchLower);
-    
-    const matchesDepartment = departmentFilter === 'all' || employee.department === departmentFilter;
-    const matchesStatus = statusFilter === 'all' || employee.status === statusFilter;
-    
-    return matchesSearch && matchesDepartment && matchesStatus;
+  // 検索・フィルタリング（追加フィルタリング）
+  const filteredVehicles = vehicles.filter((vehicle: VehicleWithAlerts) => {
+    return true; // API側でフィルタリング済み
   });
 
   // ページネーション計算
-  const totalItems = filteredEmployees.length;
+  const totalItems = filteredVehicles.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentEmployees = filteredEmployees.slice(startIndex, endIndex);
+  const currentVehicles = filteredVehicles.slice(startIndex, endIndex);
+
+  // アラート集計
+  const alertStats = {
+    inspectionExpiring: vehicles.filter(v => v.inspectionAlert).length,
+    insuranceExpiring: vehicles.filter(v => v.insuranceAlert).length,
+    totalAlerts: vehicles.filter(v => v.inspectionAlert || v.insuranceAlert).length,
+  };
 
   // ページ変更時に選択をリセット
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    setSelectedEmployeeIds(new Set());
+    setSelectedVehicleIds(new Set());
   };
 
   // 表示件数変更時にページを1に戻す
   const handleItemsPerPageChange = (items: number) => {
     setItemsPerPage(items);
     setCurrentPage(1);
-    setSelectedEmployeeIds(new Set());
+    setSelectedVehicleIds(new Set());
   };
 
-  const handleDelete = (employee: Employee) => {
-    setSelectedEmployee(employee);
+  const handleDelete = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
     setDeleteDialogOpen(true);
   };
 
-  const handleNewEmployee = () => {
-    router.push('/employees/new');
+  const handleNewVehicle = () => {
+    router.push('/vehicles/new');
   };
 
-  const handleSeedData = async () => {
-    try {
-      const response = await apiClient.post('/employees/seed');
-      alert(`${response.data.count}件のダミーデータを作成しました`);
-      refetch(); // データを再取得
-    } catch (error) {
-      alert('ダミーデータの作成に失敗しました');
-      console.error('Seed data creation failed:', error);
+  const handleRowClick = (vehicle: Vehicle) => {
+    router.push(`/vehicles/${vehicle.id}`);
+  };
+
+  // 選択機能のハンドラー
+  const handleSelectVehicle = (vehicleId: string, checked: boolean) => {
+    const newSelected = new Set(selectedVehicleIds);
+    if (checked) {
+      newSelected.add(vehicleId);
+    } else {
+      newSelected.delete(vehicleId);
     }
+    setSelectedVehicleIds(newSelected);
   };
 
-  const handleClearData = async () => {
-    if (confirm('全ての従業員データを削除しますか？この操作は元に戻せません。')) {
-      try {
-        const response = await apiClient.delete('/employees/clear');
-        alert(`${response.data.count}件のデータを削除しました`);
-        refetch(); // データを再取得
-      } catch (error) {
-        alert('データの削除に失敗しました');
-        console.error('Clear data failed:', error);
-      }
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(currentVehicles.map((vehicle: Vehicle) => vehicle.id));
+      setSelectedVehicleIds(allIds);
+    } else {
+      setSelectedVehicleIds(new Set());
     }
-  };
-
-  // インポート・エクスポート機能
-  const handleImport = () => {
-    setImportDialogOpen(true);
-  };
-
-  const handleExport = async () => {
-    try {
-      window.open('/api/employees/export', '_blank');
-    } catch (error) {
-      alert('エクスポートに失敗しました');
-      console.error('Export failed:', error);
-    }
-  };
-
-  const handleDownloadSample = () => {
-    window.open('/api/employees/sample', '_blank');
   };
 
   // 一括削除のmutation
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const response = await apiClient.delete('/employees', {
+      const response = await apiClient.delete('/vehicles', {
         data: { ids }
       });
       return response.data;
     },
     onSuccess: (data) => {
       alert(data.message);
-      setSelectedEmployeeIds(new Set());
-      queryClient.invalidateQueries({ queryKey: ['employees'] });
+      setSelectedVehicleIds(new Set());
+      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
     },
     onError: (error) => {
       alert('一括削除に失敗しました');
@@ -168,49 +148,23 @@ export default function EmployeesPage() {
   });
 
   const handleBulkDelete = () => {
-    if (selectedEmployeeIds.size === 0) {
-      alert('削除する従業員を選択してください');
+    if (selectedVehicleIds.size === 0) {
+      alert('削除する車両を選択してください');
       return;
     }
     
-    const confirmMessage = `選択した${selectedEmployeeIds.size}人の従業員情報を完全に削除します。\nこの操作は元に戻すことができません。本当に削除しますか？`;
+    const confirmMessage = `選択した${selectedVehicleIds.size}台の車両情報を完全に削除します。\\nこの操作は元に戻すことができません。本当に削除しますか？`;
     if (confirm(confirmMessage)) {
-      const ids = Array.from(selectedEmployeeIds);
+      const ids = Array.from(selectedVehicleIds);
       bulkDeleteMutation.mutate(ids);
     }
   };
 
-  const handleRowClick = (employee: Employee) => {
-    router.push(`/employees/${employee.id}`);
-  };
-
-  // 選択機能のハンドラー
-  const handleSelectEmployee = (employeeId: string, checked: boolean) => {
-    const newSelected = new Set(selectedEmployeeIds);
-    if (checked) {
-      newSelected.add(employeeId);
-    } else {
-      newSelected.delete(employeeId);
-    }
-    setSelectedEmployeeIds(newSelected);
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      const allIds = new Set(currentEmployees.map((emp: Employee) => emp.id));
-      setSelectedEmployeeIds(allIds);
-    } else {
-      setSelectedEmployeeIds(new Set());
-    }
-  };
-
-  const columns = createEmployeeTableColumns({
-    onDelete: handleDelete,
-    onRowClick: handleRowClick,
-    selectedEmployeeIds,
-    onSelectEmployee: handleSelectEmployee,
+  const columns = createVehicleTableColumns({
+    selectedVehicleIds,
+    onSelectVehicle: handleSelectVehicle,
     onSelectAll: handleSelectAll,
-    allEmployees: currentEmployees,
+    allVehicles: currentVehicles,
   });
 
   if (isLoading) {
@@ -240,21 +194,38 @@ export default function EmployeesPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
+                    <Car className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent tracking-tight">従業員管理</h1>
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent tracking-tight">車両管理</h1>
                     <p className="text-gray-600 text-lg">
-                      チーム全体の情報を効率的に管理・運用
+                      車両情報の一元管理・運用
                     </p>
                   </div>
                 </div>
+                
+                {/* アラート表示 */}
+                {alertStats.totalAlerts > 0 && (
+                  <div className="flex items-center gap-2 mt-4">
+                    <AlertTriangle className="h-5 w-5 text-amber-500" />
+                    <div className="flex gap-3 text-sm">
+                      {alertStats.inspectionExpiring > 0 && (
+                        <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200">
+                          車検期限: {alertStats.inspectionExpiring}台
+                        </Badge>
+                      )}
+                      {alertStats.insuranceExpiring > 0 && (
+                        <Badge variant="destructive" className="bg-orange-100 text-orange-800 border-orange-200">
+                          保険期限: {alertStats.insuranceExpiring}台
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <Button 
-                  onClick={handleNewEmployee}
+                  onClick={handleNewVehicle}
                   className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-6 py-3 font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -271,66 +242,17 @@ export default function EmployeesPage() {
                       その他
                     </Button>
                   </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>データ操作</DropdownMenuLabel>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuItem onClick={handleImport}>
-                        <Upload className="mr-2 h-4 w-4" />
-                        インポート
-                      </DropdownMenuItem>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>CSVファイルから従業員データを一括登録</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuItem onClick={handleExport}>
-                        <Download className="mr-2 h-4 w-4" />
-                        エクスポート
-                      </DropdownMenuItem>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>現在の従業員データをCSV形式でダウンロード</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuItem onClick={handleDownloadSample}>
-                        <FileText className="mr-2 h-4 w-4" />
-                        サンプル
-                      </DropdownMenuItem>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>インポート用のCSVテンプレートをダウンロード</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuLabel>開発用</DropdownMenuLabel>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuItem onClick={handleSeedData}>
-                        <TestTube className="mr-2 h-4 w-4" />
-                        ダミーデータを100件作成
-                      </DropdownMenuItem>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>テスト用の従業員データを自動生成</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuItem onClick={handleClearData} className="text-red-600">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        全データ削除
-                      </DropdownMenuItem>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>すべての従業員データを削除（注意：復元不可）</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </DropdownMenuContent>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>レポート</DropdownMenuLabel>
+                    <DropdownMenuItem>
+                      <FileText className="mr-2 h-4 w-4" />
+                      車検満了日一覧
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <FileText className="mr-2 h-4 w-4" />
+                      使用状況レポート
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </div>
@@ -344,7 +266,7 @@ export default function EmployeesPage() {
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <Input
-                  placeholder="従業員名、ふりがな、メールアドレス、部署で検索..."
+                  placeholder="車両名、ナンバープレート、車種、メーカーで検索..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-12 h-12 bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-lg text-base shadow-sm"
@@ -352,26 +274,26 @@ export default function EmployeesPage() {
               </div>
             </div>
             <div className="flex gap-3">
-              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                <SelectTrigger className="w-44 h-12 border-gray-300 rounded-lg shadow-sm">
-                  <SelectValue placeholder="所属部署" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">すべての部署</SelectItem>
-                  <SelectItem value="営業部">営業部</SelectItem>
-                  <SelectItem value="開発部">開発部</SelectItem>
-                  <SelectItem value="管理部">管理部</SelectItem>
-                  <SelectItem value="企画部">企画部</SelectItem>
-                </SelectContent>
-              </Select>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-40 h-12 border-gray-300 rounded-lg shadow-sm">
                   <SelectValue placeholder="ステータス" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">すべて</SelectItem>
-                  <SelectItem value="ACTIVE">アクティブ</SelectItem>
-                  <SelectItem value="INACTIVE">非アクティブ</SelectItem>
+                  <SelectItem value="active">アクティブ</SelectItem>
+                  <SelectItem value="inactive">非アクティブ</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={fuelTypeFilter} onValueChange={setFuelTypeFilter}>
+                <SelectTrigger className="w-44 h-12 border-gray-300 rounded-lg shadow-sm">
+                  <SelectValue placeholder="燃料タイプ" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">すべて</SelectItem>
+                  <SelectItem value="gasoline">ガソリン</SelectItem>
+                  <SelectItem value="diesel">ディーゼル</SelectItem>
+                  <SelectItem value="electric">電気</SelectItem>
+                  <SelectItem value="hybrid">ハイブリッド</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -382,17 +304,17 @@ export default function EmployeesPage() {
         <div className="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
 
           {/* 選択状態とアクション */}
-          {selectedEmployeeIds.size > 0 && (
+          {selectedVehicleIds.size > 0 && (
             <div className="px-6 py-4 bg-green-50 border-b border-green-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <span className="text-sm font-medium text-green-700">
-                    {selectedEmployeeIds.size}人を選択中
+                    {selectedVehicleIds.size}台を選択中
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setSelectedEmployeeIds(new Set())}
+                    onClick={() => setSelectedVehicleIds(new Set())}
                     className="h-8 text-xs"
                   >
                     選択を解除
@@ -415,7 +337,8 @@ export default function EmployeesPage() {
           <div className="overflow-x-auto">
             <DataTable
               columns={columns}
-              data={currentEmployees}
+              data={currentVehicles}
+              onRowClick={handleRowClick}
             />
           </div>
           
@@ -519,28 +442,17 @@ export default function EmployeesPage() {
       </div>
 
       {/* 削除確認ダイアログ */}
-      {selectedEmployee && (
-        <DeleteEmployeeDialog
-          employee={selectedEmployee}
+      {selectedVehicle && (
+        <DeleteVehicleDialog
+          vehicle={selectedVehicle}
           open={deleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
           onSuccess={() => {
             refetch();
-            setSelectedEmployee(null);
+            setSelectedVehicle(null);
           }}
         />
       )}
-
-      {/* インポートダイアログ */}
-      <ImportDialog
-        open={importDialogOpen}
-        onOpenChange={setImportDialogOpen}
-        onSuccess={() => {
-          refetch();
-        }}
-      />
-
-      {/* Note: AlertDialog temporarily replaced with confirm() for compatibility */}
     </div>
   );
 }

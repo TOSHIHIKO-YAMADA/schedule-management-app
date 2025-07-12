@@ -47,12 +47,22 @@ export const API_PERMISSIONS = {
   'POST /api/vehicles': ['limited_admin', 'admin', 'super'],
   'PUT /api/vehicles': ['limited_admin', 'admin', 'super'],
   'DELETE /api/vehicles': ['admin', 'super'],
+  
+  // 車両個別操作
+  'GET /api/vehicles/*': ['general'],
+  'PUT /api/vehicles/*': ['limited_admin', 'admin', 'super'],
+  'DELETE /api/vehicles/*': ['admin', 'super'],
 
   // スケジュール管理
   'GET /api/schedules': ['general'],
   'POST /api/schedules': ['general'],
   'PUT /api/schedules': ['general'], // 作成者チェックは別途
   'DELETE /api/schedules': ['general'], // 作成者チェックは別途
+  
+  // スケジュール個別操作
+  'GET /api/schedules/*': ['general'],
+  'PUT /api/schedules/*': ['general'], // 作成者・担当者チェックは別途
+  'DELETE /api/schedules/*': ['limited_admin', 'admin', 'super'],
 
   // タスク管理
   'GET /api/tasks': ['general'],
