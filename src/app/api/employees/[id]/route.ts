@@ -1,71 +1,86 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { updateEmployeeSchema } from '@/lib/validations/employee';
-import { ZodError } from 'zod';
+import { z } from 'zod';
+import prisma from '@/lib/prisma';
+import { 
+  createSuccessResponse, 
+  createErrorResponse, 
+  withErrorHandling,
+  validateRequestBody,
+  validateEntityExists,
+  HTTP_STATUS 
+} from '@/lib/api-utils';
+import { withAuth, isAdmin, isSuperAdmin } from '@/lib/auth-utils';
+
+// バリデーションスキーマ
+const updateEmployeeSchema = z.object({
+  name: z.string().min(1, '氏名は必須です').optional(),
+  nameKana: z.string().min(1, 'ふりがなは必須です').optional(),
+  email: z.string().email('有効なメールアドレスを入力してください').optional(),
+  phone: z.string().min(1, '電話番号は必須です').optional(),
+  lineId: z.string().optional(),
+  notificationMethod: z.enum(['email', 'line', 'both']).optional(),
+  department: z.string().min(1, '所属は必須です').optional(),
+  position: z.string().min(1, '役職は必須です').optional(),
+  nearestStation: z.string().min(1, '最寄り駅は必須です').optional(),
+  transportation: z.enum(['train', 'car', 'bicycle', 'walk', 'bus']).optional(),
+  status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
+});
 
 // GET /api/employees/[id] - 従業員詳細取得
-export async function GET(
+export const GET = withErrorHandling(async (
   request: NextRequest,
   { params }: { params: { id: string } }
-) {
-  try {
+) => {
+  return withAuth(request, async (request, user) => {
     const employee = await prisma.employee.findUnique({
       where: { id: params.id },
     });
 
     if (!employee) {
-      return NextResponse.json(
-        { error: '従業員が見つかりません' },
-        { status: 404 }
+      return createErrorResponse(
+        '従業員が見つかりません',
+        HTTP_STATUS.NOT_FOUND
       );
     }
 
-    return NextResponse.json(employee);
-  } catch (error) {
-    console.error('Failed to fetch employee:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch employee' },
-      { status: 500 }
-    );
-  }
-}
+    return createSuccessResponse(employee);
+  });
+});
 
 // PUT /api/employees/[id] - 従業員更新
-export async function PUT(
+export const PUT = withErrorHandling(async (
   request: NextRequest,
   { params }: { params: { id: string } }
-) {
-  try {
+) => {
+  return withAuth(request, async (request, user) => {
     const body = await request.json();
-    
-    // バリデーション
     const validatedData = updateEmployeeSchema.parse(body);
 
-    // 従業員の存在確認
+    // 既存の従業員を確認
     const existingEmployee = await prisma.employee.findUnique({
       where: { id: params.id },
     });
 
     if (!existingEmployee) {
-      return NextResponse.json(
-        { error: '従業員が見つかりません' },
-        { status: 404 }
+      return createErrorResponse(
+        '従業員が見つかりません',
+        HTTP_STATUS.NOT_FOUND
       );
     }
 
     // メールアドレスの重複チェック（自分以外）
-    if (validatedData.email) {
-      const emailDuplicate = await prisma.employee.findFirst({
+    if (validatedData.email && validatedData.email !== existingEmployee.email) {
+      const existingEmail = await prisma.employee.findFirst({
         where: {
-          id: { not: params.id },
           email: validatedData.email,
+          id: { not: params.id },
         },
       });
 
-      if (emailDuplicate) {
-        return NextResponse.json(
-          { error: 'このメールアドレスは既に使用されています' },
-          { status: 409 }
+      if (existingEmail) {
+        return createErrorResponse(
+          'メールアドレスが既に使用されています',
+          HTTP_STATUS.BAD_REQUEST
         );
       }
     }
@@ -76,38 +91,28 @@ export async function PUT(
       data: validatedData,
     });
 
-    return NextResponse.json(updatedEmployee);
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
-      );
-    }
-
-    console.error('Failed to update employee:', error);
-    return NextResponse.json(
-      { error: 'Failed to update employee' },
-      { status: 500 }
+    return createSuccessResponse(
+      updatedEmployee,
+      '従業員情報が更新されました'
     );
-  }
-}
+  });
+});
 
 // DELETE /api/employees/[id] - 従業員削除
-export async function DELETE(
+export const DELETE = withErrorHandling(async (
   request: NextRequest,
   { params }: { params: { id: string } }
-) {
-  try {
-    // 従業員の存在確認
+) => {
+  return withAuth(request, async (request, user) => {
+    // 既存の従業員を確認
     const existingEmployee = await prisma.employee.findUnique({
       where: { id: params.id },
     });
 
     if (!existingEmployee) {
-      return NextResponse.json(
-        { error: '従業員が見つかりません' },
-        { status: 404 }
+      return createErrorResponse(
+        '従業員が見つかりません',
+        HTTP_STATUS.NOT_FOUND
       );
     }
 
@@ -116,15 +121,9 @@ export async function DELETE(
       where: { id: params.id },
     });
 
-    return NextResponse.json(
-      { message: '従業員が削除されました' },
-      { status: 200 }
+    return createSuccessResponse(
+      null,
+      '従業員が削除されました'
     );
-  } catch (error) {
-    console.error('Failed to delete employee:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete employee' },
-      { status: 500 }
-    );
-  }
-}
+  });
+});
