@@ -32,12 +32,15 @@ type CustomerFormData = z.infer<typeof customerSchema>;
 
 interface CustomerFormProps {
   customerId?: string;
+  customer?: Customer;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
-export function CustomerForm({ customerId }: CustomerFormProps) {
+export function CustomerForm({ customerId, customer: providedCustomer, onSuccess, onCancel }: CustomerFormProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const isEdit = !!customerId;
+  const isEdit = !!(customerId || providedCustomer);
 
   const {
     register,
@@ -60,15 +63,18 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
     },
   });
 
-  // 編集時のデータ取得
-  const { data: customer, isLoading, error } = useQuery({
+  // 編集時のデータ取得（providedCustomerがない場合のみ）
+  const { data: fetchedCustomer, isLoading, error } = useQuery({
     queryKey: ['customer', customerId],
     queryFn: async () => {
       const response = await apiClient.get(`/customers/${customerId}`);
       return response.data as Customer;
     },
-    enabled: isEdit,
+    enabled: isEdit && !providedCustomer,
   });
+
+  // 使用するcustomerデータ（providedCustomerまたはfetchedCustomer）
+  const customer = providedCustomer || fetchedCustomer;
 
   // フォームにデータをセット
   useEffect(() => {
@@ -89,8 +95,9 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
   // 作成・更新処理
   const saveMutation = useMutation({
     mutationFn: async (data: CustomerFormData) => {
-      if (isEdit) {
-        const response = await apiClient.put(`/customers/${customerId}`, data);
+      const id = customerId || customer?.id;
+      if (isEdit && id) {
+        const response = await apiClient.put(`/customers/${id}`, data);
         return response.data;
       } else {
         const response = await apiClient.post('/customers', data);
@@ -99,7 +106,11 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
-      router.push('/customers');
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push('/customers');
+      }
     },
   });
 
@@ -107,7 +118,10 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
     saveMutation.mutate(data);
   };
 
-  if (isEdit && isLoading) {
+  // onCancelまたはonSuccessが提供されている場合は独立したコンポーネントとして動作
+  const isStandalone = !onCancel && !onSuccess;
+
+  if (isEdit && isLoading && isStandalone) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center">
         <LoadingSpinner />
@@ -115,7 +129,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
     );
   }
 
-  if (isEdit && error) {
+  if (isEdit && error && isStandalone) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 p-6">
         <div className="max-w-2xl mx-auto">
@@ -125,13 +139,22 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
     );
   }
 
+  // 埋め込み時（詳細画面など）でローディング中またはエラーの場合
+  if (isEdit && isLoading && !isStandalone) {
+    return <LoadingSpinner />;
+  }
+
+  if (isEdit && error && !isStandalone) {
+    return <ApiErrorAlert error={error} onRetry={() => window.location.reload()} />;
+  }
+
   const isActive = watch('isActive');
   const industry = watch('industry');
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 p-6">
-      <div className="max-w-2xl mx-auto">
-        {/* ヘッダー */}
+  const formContent = (
+    <>
+      {/* スタンドアロン時のヘッダー */}
+      {isStandalone && (
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-t-2xl shadow-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
@@ -152,6 +175,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
             </Button>
           </div>
         </div>
+      )}
 
         {/* フォーム */}
         <div className="bg-white rounded-b-2xl shadow-xl p-6">
@@ -306,7 +330,7 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.push('/customers')}
+                onClick={onCancel || (() => router.push('/customers'))}
               >
                 キャンセル
               </Button>
@@ -330,7 +354,16 @@ export function CustomerForm({ customerId }: CustomerFormProps) {
             </div>
           </form>
         </div>
+    </>
+  );
+
+  return isStandalone ? (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 p-6">
+      <div className="max-w-2xl mx-auto">
+        {formContent}
       </div>
     </div>
+  ) : (
+    formContent
   );
 }
