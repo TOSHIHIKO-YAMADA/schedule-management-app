@@ -31,6 +31,16 @@ export const API_PERMISSIONS = {
   'POST /api/customers/import': ['admin', 'super'],
   'GET /api/customers/sample': ['general'],
   'POST /api/customers/seed': ['super'],
+  
+  // 従業員個別操作
+  'GET /api/employees/*': ['general'],
+  'PUT /api/employees/*': ['limited_admin', 'admin', 'super'],
+  'DELETE /api/employees/*': ['super'],
+  
+  // 顧客個別操作
+  'GET /api/customers/*': ['general'],
+  'PUT /api/customers/*': ['limited_admin', 'admin', 'super'],
+  'DELETE /api/customers/*': ['admin', 'super'],
 
   // 車両管理
   'GET /api/vehicles': ['general'],
@@ -147,11 +157,24 @@ export function hasPermission(userRole: UserRole, requiredRoles: UserRole[]): bo
 
 // API権限チェック
 export function checkApiPermission(method: string, pathname: string, userRole: UserRole): boolean {
-  const key = `${method} ${pathname}` as keyof typeof API_PERMISSIONS;
-  const requiredRoles = API_PERMISSIONS[key];
+  // 完全一致でチェック
+  let key = `${method} ${pathname}` as keyof typeof API_PERMISSIONS;
+  let requiredRoles = API_PERMISSIONS[key];
+  
+  // 完全一致がない場合、ワイルドカードパターンをチェック
+  if (!requiredRoles) {
+    // パスの最後のセグメント（ID部分）をワイルドカードに置換
+    const pathSegments = pathname.split('/');
+    if (pathSegments.length > 3) { // /api/entity/id の形式の場合
+      const wildcardPath = pathSegments.slice(0, -1).join('/') + '/*';
+      key = `${method} ${wildcardPath}` as keyof typeof API_PERMISSIONS;
+      requiredRoles = API_PERMISSIONS[key];
+    }
+  }
   
   if (!requiredRoles) {
     // 権限設定がない場合はアクセス拒否
+    console.warn(`API権限設定が見つかりません: ${method} ${pathname}`);
     return false;
   }
 
@@ -164,6 +187,8 @@ export async function withAuth(
   handler: (request: NextRequest, user: any) => Promise<Response>
 ) {
   // 開発環境でも適切な認証チェックを実行
+  const method = request.method;
+  const pathname = new URL(request.url).pathname;
 
   const user = await getCurrentUser(request);
   
@@ -182,10 +207,9 @@ export async function withAuth(
   }
 
   // API権限チェック
-  const method = request.method;
-  const pathname = new URL(request.url).pathname;
+  const hasPermission = checkApiPermission(method, pathname, user.role as UserRole);
   
-  if (!checkApiPermission(method, pathname, user.role as UserRole)) {
+  if (!hasPermission) {
     return createErrorResponse(
       'この操作を実行する権限がありません',
       HTTP_STATUS.FORBIDDEN

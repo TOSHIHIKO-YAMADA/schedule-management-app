@@ -31,42 +31,6 @@ export const GET = withErrorHandling(async (
   return withAuth(request, async (request, user) => {
     const customer = await prisma.customer.findUnique({
       where: { id: params.id },
-      include: {
-        _count: {
-          select: {
-            schedules: true,
-          },
-        },
-        schedules: {
-          where: {
-            status: { not: 'cancelled' },
-          },
-          select: {
-            id: true,
-            title: true,
-            startDate: true,
-            endDate: true,
-            status: true,
-            creator: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-            vehicle: {
-              select: {
-                id: true,
-                name: true,
-                licensePlate: true,
-              },
-            },
-          },
-          orderBy: {
-            startDate: 'desc',
-          },
-          take: 10,
-        },
-      },
     });
 
     if (!customer) {
@@ -147,18 +111,6 @@ export const DELETE = withErrorHandling(async (
     // 既存の顧客を確認
     const existingCustomer = await prisma.customer.findUnique({
       where: { id: params.id },
-      include: {
-        _count: {
-          select: {
-            schedules: true,
-          },
-        },
-        schedules: {
-          where: {
-            status: { in: ['scheduled', 'in_progress'] },
-          },
-        },
-      },
     });
 
     if (!existingCustomer) {
@@ -171,42 +123,16 @@ export const DELETE = withErrorHandling(async (
       );
     }
 
-    // アクティブなスケジュールがある場合は削除不可
-    if (existingCustomer.schedules.length > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'アクティブなスケジュールが存在するため削除できません',
-          details: `${existingCustomer.schedules.length}件のアクティブなスケジュールがあります`,
-        },
-        { status: 400 }
-      );
-    }
+    // 現在は関連データがないため、直接削除
+    // 将来的にScheduleモデルが追加されたら、関連チェックを再実装
+    await prisma.customer.delete({
+      where: { id: params.id },
+    });
 
-    // 関連データがある場合は論理削除
-    if (existingCustomer._count.schedules > 0) {
-      // 論理削除（isActiveをfalseに設定）
-      const deactivatedCustomer = await prisma.customer.update({
-        where: { id: params.id },
-        data: { isActive: false },
-      });
-
-      return NextResponse.json({
-        success: true,
-        data: deactivatedCustomer,
-        message: '顧客を無効化しました（関連データがあるため物理削除は行われませんでした）',
-      });
-    } else {
-      // 物理削除
-      await prisma.customer.delete({
-        where: { id: params.id },
-      });
-
-      return createSuccessResponse(
-        null,
-        '顧客が削除されました'
-      );
-    }
+    return createSuccessResponse(
+      null,
+      '顧客が削除されました'
+    );
 
   });
 });
