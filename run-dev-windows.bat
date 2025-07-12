@@ -1,0 +1,13 @@
+@echo off
+echo Starting development server on Windows...
+
+echo Method 1: Using direct path...
+if exist node_modules\.bin\next.cmd (
+    echo Found next.cmd, starting with direct path...
+    .\node_modules\.bin\next.cmd dev --turbopack
+) else (
+    echo Method 2: Using npx...
+    npx next dev --turbopack
+)
+
+pause

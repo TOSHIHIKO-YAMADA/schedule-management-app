@@ -1,0 +1,675 @@
+
+> schedule-management-app@0.1.0 dev
+> next dev --turbopack
+
+ ⚠ Port 3000 is in use, using available port 3001 instead.
+   ▲ Next.js 15.3.5 (Turbopack)
+   - Local:        http://localhost:3001
+   - Network:      http://10.255.255.254:3001
+   - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Compiled middleware in 136ms
+ ✓ Ready in 971ms
+   Reload env: .env.local
+ ○ Compiling /api/tasks ...
+ ✓ Compiled /api/tasks in 674ms
+prisma:query SELECT `main`.`tasks`.`id`, `main`.`tasks`.`title`, `main`.`tasks`.`description`, `main`.`tasks`.`priority`, `main`.`tasks`.`status`, `main`.`tasks`.`dueDate`, `main`.`tasks`.`progress`, `main`.`tasks`.`assignedTo`, `main`.`tasks`.`scheduleId`, `main`.`tasks`.`createdBy`, `main`.`tasks`.`createdAt`, `main`.`tasks`.`updatedAt` FROM `main`.`tasks` WHERE 1=1 ORDER BY `main`.`tasks`.`status` ASC, `main`.`tasks`.`priority` ASC, `main`.`tasks`.`dueDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`employees`.`id`, `main`.`employees`.`name`, `main`.`employees`.`email` FROM `main`.`employees` WHERE `main`.`employees`.`id` IN (?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`schedules`.`id`, `main`.`schedules`.`title`, `main`.`schedules`.`startDate`, `main`.`schedules`.`endDate` FROM `main`.`schedules` WHERE `main`.`schedules`.`id` IN (?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/tasks 200 in 835ms
+ ○ Compiling /schedules ...
+ ✓ Compiled /schedules in 2.1s
+ GET /schedules 200 in 2358ms
+ ○ Compiling /_not-found/page ...
+ ✓ Compiled /_not-found/page in 608ms
+ GET /employees 404 in 638ms
+ GET /customers 404 in 29ms
+ GET /vehicles 404 in 28ms
+ GET /schedules 200 in 49ms
+ GET /tasks 404 in 26ms
+ GET /vehicle-usages 404 in 26ms
+ GET /employees 404 in 26ms
+ POST /employees 404 in 29ms
+ POST /employees 404 in 26ms
+ GET /schedules/sch_1 404 in 25ms
+ GET /customers/cust_1 404 in 26ms
+ GET /vehicles/veh_1 404 in 24ms
+ GET /tasks/task_1 404 in 25ms
+ GET /schedules/nonexistent_123 404 in 25ms
+ GET /schedules?startDate=2024-01-01%27%20OR%201=1-- 200 in 44ms
+ GET /employees/emp_1 404 in 28ms
+ ✓ Compiled /api/schedules in 357ms
+prisma:query SELECT 1
+prisma:query SELECT `main`.`schedules`.`id`, `main`.`schedules`.`title`, `main`.`schedules`.`description`, `main`.`schedules`.`startDate`, `main`.`schedules`.`endDate`, `main`.`schedules`.`startTime`, `main`.`schedules`.`endTime`, `main`.`schedules`.`category`, `main`.`schedules`.`priority`, `main`.`schedules`.`location`, `main`.`schedules`.`status`, `main`.`schedules`.`isRecurring`, `main`.`schedules`.`customerId`, `main`.`schedules`.`vehicleId`, `main`.`schedules`.`createdBy`, `main`.`schedules`.`reminderEnabled`, `main`.`schedules`.`reminderMinutesBefore`, `main`.`schedules`.`recurringType`, `main`.`schedules`.`recurringInterval`, `main`.`schedules`.`recurringDaysOfWeek`, `main`.`schedules`.`recurringEndDate`, `main`.`schedules`.`recurringMaxOccurrences`, `main`.`schedules`.`createdAt`, `main`.`schedules`.`updatedAt` FROM `main`.`schedules` WHERE 1=1 ORDER BY `main`.`schedules`.`startDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`customers`.`id`, `main`.`customers`.`name`, `main`.`customers`.`address`, `main`.`customers`.`phone`, `main`.`customers`.`contactPerson`, `main`.`customers`.`email`, `main`.`customers`.`website`, `main`.`customers`.`industry`, `main`.`customers`.`isActive`, `main`.`customers`.`createdAt`, `main`.`customers`.`updatedAt` FROM `main`.`customers` WHERE `main`.`customers`.`id` IN (?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`vehicles`.`id`, `main`.`vehicles`.`name`, `main`.`vehicles`.`licensePlate`, `main`.`vehicles`.`inspectionDate`, `main`.`vehicles`.`type`, `main`.`vehicles`.`capacity`, `main`.`vehicles`.`fuelType`, `main`.`vehicles`.`isActive`, `main`.`vehicles`.`createdAt`, `main`.`vehicles`.`updatedAt` FROM `main`.`vehicles` WHERE `main`.`vehicles`.`id` IN (?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`employees`.`id`, `main`.`employees`.`name`, `main`.`employees`.`email` FROM `main`.`employees` WHERE `main`.`employees`.`id` IN (?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`schedule_attendees`.`id`, `main`.`schedule_attendees`.`scheduleId`, `main`.`schedule_attendees`.`employeeId` FROM `main`.`schedule_attendees` WHERE `main`.`schedule_attendees`.`scheduleId` IN (?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`tasks`.`id`, `main`.`tasks`.`title`, `main`.`tasks`.`status`, `main`.`tasks`.`priority`, `main`.`tasks`.`scheduleId` FROM `main`.`tasks` WHERE `main`.`tasks`.`scheduleId` IN (?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/schedules 200 in 389ms
+ GET /api/schedules 200 in 94ms
+prisma:query SELECT 1
+prisma:query SELECT `main`.`schedules`.`id`, `main`.`schedules`.`title`, `main`.`schedules`.`description`, `main`.`schedules`.`startDate`, `main`.`schedules`.`endDate`, `main`.`schedules`.`startTime`, `main`.`schedules`.`endTime`, `main`.`schedules`.`category`, `main`.`schedules`.`priority`, `main`.`schedules`.`location`, `main`.`schedules`.`status`, `main`.`schedules`.`isRecurring`, `main`.`schedules`.`customerId`, `main`.`schedules`.`vehicleId`, `main`.`schedules`.`createdBy`, `main`.`schedules`.`reminderEnabled`, `main`.`schedules`.`reminderMinutesBefore`, `main`.`schedules`.`recurringType`, `main`.`schedules`.`recurringInterval`, `main`.`schedules`.`recurringDaysOfWeek`, `main`.`schedules`.`recurringEndDate`, `main`.`schedules`.`recurringMaxOccurrences`, `main`.`schedules`.`createdAt`, `main`.`schedules`.`updatedAt` FROM `main`.`schedules` WHERE 1=1 ORDER BY `main`.`schedules`.`startDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`customers`.`id`, `main`.`customers`.`name`, `main`.`customers`.`address`, `main`.`customers`.`phone`, `main`.`customers`.`contactPerson`, `main`.`customers`.`email`, `main`.`customers`.`website`, `main`.`customers`.`industry`, `main`.`customers`.`isActive`, `main`.`customers`.`createdAt`, `main`.`customers`.`updatedAt` FROM `main`.`customers` WHERE `main`.`customers`.`id` IN (?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`vehicles`.`id`, `main`.`vehicles`.`name`, `main`.`vehicles`.`licensePlate`, `main`.`vehicles`.`inspectionDate`, `main`.`vehicles`.`type`, `main`.`vehicles`.`capacity`, `main`.`vehicles`.`fuelType`, `main`.`vehicles`.`isActive`, `main`.`vehicles`.`createdAt`, `main`.`vehicles`.`updatedAt` FROM `main`.`vehicles` WHERE `main`.`vehicles`.`id` IN (?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`employees`.`id`, `main`.`employees`.`name`, `main`.`employees`.`email` FROM `main`.`employees` WHERE `main`.`employees`.`id` IN (?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`schedule_attendees`.`id`, `main`.`schedule_attendees`.`scheduleId`, `main`.`schedule_attendees`.`employeeId` FROM `main`.`schedule_attendees` WHERE `main`.`schedule_attendees`.`scheduleId` IN (?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`tasks`.`id`, `main`.`tasks`.`title`, `main`.`tasks`.`status`, `main`.`tasks`.`priority`, `main`.`tasks`.`scheduleId` FROM `main`.`tasks` WHERE `main`.`tasks`.`scheduleId` IN (?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/schedules 401 in 86ms
+prisma:query SELECT 1
+ GET /api/schedules 403 in 16ms
+prisma:query SELECT `main`.`employees`.`id`, `main`.`employees`.`name`, `main`.`employees`.`email`, `main`.`employees`.`role`, `main`.`employees`.`isActive` FROM `main`.`employees` WHERE (`main`.`employees`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT 1
+prisma:query SELECT `main`.`employees`.`id`, `main`.`employees`.`name`, `main`.`employees`.`email`, `main`.`employees`.`role`, `main`.`employees`.`isActive` FROM `main`.`employees` WHERE (`main`.`employees`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`schedules`.`id`, `main`.`schedules`.`title`, `main`.`schedules`.`description`, `main`.`schedules`.`startDate`, `main`.`schedules`.`endDate`, `main`.`schedules`.`startTime`, `main`.`schedules`.`endTime`, `main`.`schedules`.`category`, `main`.`schedules`.`priority`, `main`.`schedules`.`location`, `main`.`schedules`.`status`, `main`.`schedules`.`isRecurring`, `main`.`schedules`.`customerId`, `main`.`schedules`.`vehicleId`, `main`.`schedules`.`createdBy`, `main`.`schedules`.`reminderEnabled`, `main`.`schedules`.`reminderMinutesBefore`, `main`.`schedules`.`recurringType`, `main`.`schedules`.`recurringInterval`, `main`.`schedules`.`recurringDaysOfWeek`, `main`.`schedules`.`recurringEndDate`, `main`.`schedules`.`recurringMaxOccurrences`, `main`.`schedules`.`createdAt`, `main`.`schedules`.`updatedAt` FROM `main`.`schedules` WHERE 1=1 ORDER BY `main`.`schedules`.`startDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`customers`.`id`, `main`.`customers`.`name`, `main`.`customers`.`address`, `main`.`customers`.`phone`, `main`.`customers`.`contactPerson`, `main`.`customers`.`email`, `main`.`customers`.`website`, `main`.`customers`.`industry`, `main`.`customers`.`isActive`, `main`.`customers`.`createdAt`, `main`.`customers`.`updatedAt` FROM `main`.`customers` WHERE `main`.`customers`.`id` IN (?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`vehicles`.`id`, `main`.`vehicles`.`name`, `main`.`vehicles`.`licensePlate`, `main`.`vehicles`.`inspectionDate`, `main`.`vehicles`.`type`, `main`.`vehicles`.`capacity`, `main`.`vehicles`.`fuelType`, `main`.`vehicles`.`isActive`, `main`.`vehicles`.`createdAt`, `main`.`vehicles`.`updatedAt` FROM `main`.`vehicles` WHERE `main`.`vehicles`.`id` IN (?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`employees`.`id`, `main`.`employees`.`name`, `main`.`employees`.`email` FROM `main`.`employees` WHERE `main`.`employees`.`id` IN (?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`schedule_attendees`.`id`, `main`.`schedule_attendees`.`scheduleId`, `main`.`schedule_attendees`.`employeeId` FROM `main`.`schedule_attendees` WHERE `main`.`schedule_attendees`.`scheduleId` IN (?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`tasks`.`id`, `main`.`tasks`.`title`, `main`.`tasks`.`status`, `main`.`tasks`.`priority`, `main`.`tasks`.`scheduleId` FROM `main`.`tasks` WHERE `main`.`tasks`.`scheduleId` IN (?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/schedules 200 in 73ms
+ GET /schedules 200 in 65ms
+ GET /employees 404 in 37ms
+ GET /customers 404 in 29ms
+ GET /vehicles 404 in 28ms
+ GET /schedules 200 in 49ms
+ GET /tasks 404 in 27ms
+ GET /vehicle-usages 404 in 25ms
+ GET /employees 404 in 26ms
+ POST /employees 404 in 27ms
+ POST /employees 404 in 25ms
+ GET /schedules/sch_1 404 in 23ms
+ GET /customers/cust_1 404 in 26ms
+ GET /vehicles/veh_1 404 in 24ms
+ GET /tasks/task_1 404 in 24ms
+ GET /schedules/nonexistent_123 404 in 25ms
+ GET /schedules?startDate=2024-01-01%27%20OR%201=1-- 200 in 39ms
+ GET /employees/emp_1 404 in 25ms
+prisma:query SELECT 1
+prisma:query SELECT `main`.`employees`.`id`, `main`.`employees`.`name`, `main`.`employees`.`email`, `main`.`employees`.`role`, `main`.`employees`.`isActive` FROM `main`.`employees` WHERE (`main`.`employees`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`schedules`.`id`, `main`.`schedules`.`title`, `main`.`schedules`.`description`, `main`.`schedules`.`startDate`, `main`.`schedules`.`endDate`, `main`.`schedules`.`startTime`, `main`.`schedules`.`endTime`, `main`.`schedules`.`category`, `main`.`schedules`.`priority`, `main`.`schedules`.`location`, `main`.`schedules`.`status`, `main`.`schedules`.`isRecurring`, `main`.`schedules`.`customerId`, `main`.`schedules`.`vehicleId`, `main`.`schedules`.`createdBy`, `main`.`schedules`.`reminderEnabled`, `main`.`schedules`.`reminderMinutesBefore`, `main`.`schedules`.`recurringType`, `main`.`schedules`.`recurringInterval`, `main`.`schedules`.`recurringDaysOfWeek`, `main`.`schedules`.`recurringEndDate`, `main`.`schedules`.`recurringMaxOccurrences`, `main`.`schedules`.`createdAt`, `main`.`schedules`.`updatedAt` FROM `main`.`schedules` WHERE 1=1 ORDER BY `main`.`schedules`.`startDate` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`customers`.`id`, `main`.`customers`.`name`, `main`.`customers`.`address`, `main`.`customers`.`phone`, `main`.`customers`.`contactPerson`, `main`.`customers`.`email`, `main`.`customers`.`website`, `main`.`customers`.`industry`, `main`.`customers`.`isActive`, `main`.`customers`.`createdAt`, `main`.`customers`.`updatedAt` FROM `main`.`customers` WHERE `main`.`customers`.`id` IN (?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`vehicles`.`id`, `main`.`vehicles`.`name`, `main`.`vehicles`.`licensePlate`, `main`.`vehicles`.`inspectionDate`, `main`.`vehicles`.`type`, `main`.`vehicles`.`capacity`, `main`.`vehicles`.`fuelType`, `main`.`vehicles`.`isActive`, `main`.`vehicles`.`createdAt`, `main`.`vehicles`.`updatedAt` FROM `main`.`vehicles` WHERE `main`.`vehicles`.`id` IN (?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`employees`.`id`, `main`.`employees`.`name`, `main`.`employees`.`email` FROM `main`.`employees` WHERE `main`.`employees`.`id` IN (?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`schedule_attendees`.`id`, `main`.`schedule_attendees`.`scheduleId`, `main`.`schedule_attendees`.`employeeId` FROM `main`.`schedule_attendees` WHERE `main`.`schedule_attendees`.`scheduleId` IN (?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`tasks`.`id`, `main`.`tasks`.`title`, `main`.`tasks`.`status`, `main`.`tasks`.`priority`, `main`.`tasks`.`scheduleId` FROM `main`.`tasks` WHERE `main`.`tasks`.`scheduleId` IN (?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/schedules 200 in 21ms
+ ✓ Compiled /api/employees in 355ms
+ GET /api/employees 401 in 375ms
+ ✓ Compiled /api/customers in 269ms
+ ⨯ ./src/app/api/customers/route.ts:68:4
+Parsing ecmascript source code failed
+[0m [90m 66 |[39m[0m
+[0m [90m 67 |[39m     [36mreturn[39m createSuccessResponse(customers)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 68 |[39m   })[33m;[39m[0m
+[0m [90m    |[39m    [31m[1m^[22m[39m[0m
+[0m [90m 69 |[39m })[33m;[39m[0m
+[0m [90m 70 |[39m[0m
+[0m [90m 71 |[39m [90m// POST /api/customers - 顧客作成[39m[0m
+
+Expression expected
+
+
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 750ms
+ GET /api/customers 500 in 1124ms
+ ✓ Compiled /api/vehicles in 386ms
+ GET /api/vehicles 500 in 407ms
+ GET /api/schedules 500 in 24ms
+ GET /api/tasks 500 in 27ms
+ ✓ Compiled /api/vehicle-usages in 288ms
+ ⨯ ./src/app/api/vehicle-usages/route.ts:225:5
+Parsing ecmascript source code failed
+[0m [90m 223 |[39m     }[33m,[39m { status[33m:[39m [35m201[39m })[33m;[39m[0m
+[0m [90m 224 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 225 |[39m   } [36mcatch[39m (error) {[0m
+[0m [90m     |[39m     [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 226 |[39m     [36mif[39m (error [36minstanceof[39m z[33m.[39m[33mZodError[39m) {[0m
+[0m [90m 227 |[39m       [36mreturn[39m [33mNextResponse[39m[33m.[39mjson([0m
+[0m [90m 228 |[39m         {[0m
+
+Expected ',', got 'catch'
+
+
+ GET /api/vehicle-usages 500 in 302ms
+ GET /api/employees 500 in 24ms
+ POST /api/employees 500 in 22ms
+ POST /api/employees 500 in 23ms
+ ✓ Compiled /api/schedules/[id] in 265ms
+ ⨯ ./src/app/api/schedules/[id]/route.ts:227:5
+Parsing ecmascript source code failed
+[0m [90m 225 |[39m     })[33m;[39m[0m
+[0m [90m 226 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 227 |[39m   } [36mcatch[39m (error) {[0m
+[0m [90m     |[39m     [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 228 |[39m     [36mif[39m (error [36minstanceof[39m z[33m.[39m[33mZodError[39m) {[0m
+[0m [90m 229 |[39m       [36mreturn[39m [33mNextResponse[39m[33m.[39mjson([0m
+[0m [90m 230 |[39m         {[0m
+
+Expected ',', got 'catch'
+
+
+ GET /api/schedules/sch_1 500 in 280ms
+ ✓ Compiled /api/customers/[id] in 279ms
+ ⨯ ./src/app/api/customers/[id]/route.ts:100:1
+Parsing ecmascript source code failed
+[0m [90m  98 |[39m[0m
+[0m [90m  99 |[39m [90m// PUT /api/customers/[id] - 顧客更新[39m[0m
+[0m[31m[1m>[22m[39m[90m 100 |[39m [36mexport[39m [36mconst[39m [33mPUT[39m [33m=[39m withErrorHandling([36masync[39m ([0m
+[0m [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 101 |[39m   request[33m:[39m [33mNextRequest[39m[33m,[39m[0m
+[0m [90m 102 |[39m   { params }[33m:[39m { params[33m:[39m { id[33m:[39m string } }[0m
+[0m [90m 103 |[39m ) [33m=>[39m {[0m
+
+Expected ',', got 'export'
+
+
+ GET /api/customers/cust_1 500 in 295ms
+ ✓ Compiled /api/vehicles/[id] in 261ms
+ ⨯ ./src/app/api/vehicles/[id]/route.ts:113:1
+Parsing ecmascript source code failed
+[0m [90m 111 |[39m[0m
+[0m [90m 112 |[39m [90m// PUT /api/vehicles/[id] - 車両更新[39m[0m
+[0m[31m[1m>[22m[39m[90m 113 |[39m [36mexport[39m [36mconst[39m [33mPUT[39m [33m=[39m withErrorHandling([36masync[39m ([0m
+[0m [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 114 |[39m   request[33m:[39m [33mNextRequest[39m[33m,[39m[0m
+[0m [90m 115 |[39m   { params }[33m:[39m { params[33m:[39m { id[33m:[39m string } }[0m
+[0m [90m 116 |[39m ) [33m=>[39m {[0m
+
+Expected ',', got 'export'
+
+
+ GET /api/vehicles/veh_1 500 in 275ms
+ ✓ Compiled /api/tasks/[id] in 248ms
+ ⨯ ./src/app/api/tasks/[id]/route.ts:104:1
+Parsing ecmascript source code failed
+[0m [90m 102 |[39m[0m
+[0m [90m 103 |[39m [90m// PUT /api/tasks/[id] - タスク更新[39m[0m
+[0m[31m[1m>[22m[39m[90m 104 |[39m [36mexport[39m [36mconst[39m [33mPUT[39m [33m=[39m withErrorHandling([36masync[39m ([0m
+[0m [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 105 |[39m   request[33m:[39m [33mNextRequest[39m[33m,[39m[0m
+[0m [90m 106 |[39m   { params }[33m:[39m { params[33m:[39m { id[33m:[39m string } }[0m
+[0m [90m 107 |[39m ) [33m=>[39m {[0m
+
+Expected ',', got 'export'
+
+
+ GET /api/tasks/task_1 500 in 263ms
+ ⨯ ./src/app/api/schedules/[id]/route.ts:227:5
+Parsing ecmascript source code failed
+[0m [90m 225 |[39m     })[33m;[39m[0m
+[0m [90m 226 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 227 |[39m   } [36mcatch[39m (error) {[0m
+[0m [90m     |[39m     [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 228 |[39m     [36mif[39m (error [36minstanceof[39m z[33m.[39m[33mZodError[39m) {[0m
+[0m [90m 229 |[39m       [36mreturn[39m [33mNextResponse[39m[33m.[39mjson([0m
+[0m [90m 230 |[39m         {[0m
+
+Expected ',', got 'catch'
+
+
+ GET /api/schedules/nonexistent_123 500 in 20ms
+ GET /api/schedules?startDate=2024-01-01%27%20OR%201=1-- 500 in 30ms
+ ✓ Compiled /api/employees/[id] in 350ms
+ GET /api/employees/emp_1 500 in 376ms
+ GET /api/schedules 500 in 41ms
+ GET /api/employees 500 in 35ms
+ GET /api/customers 500 in 63ms
+ GET /api/vehicles 500 in 31ms
+ GET /api/schedules 500 in 31ms
+ GET /api/tasks 500 in 33ms
+ GET /api/vehicle-usages 500 in 55ms
+ GET /api/employees 500 in 31ms
+ POST /api/employees 500 in 30ms
+ POST /api/employees 500 in 30ms
+ ⨯ ./src/app/api/schedules/[id]/route.ts:303:2
+Parsing ecmascript source code failed
+[0m [90m 301 |[39m     )[33m;[39m[0m
+[0m [90m 302 |[39m   }[0m
+[0m[31m[1m>[22m[39m[90m 303 |[39m }[0m
+[0m [90m     |[39m  [31m[1m^[22m[39m[0m
+
+Unexpected eof
+
+
+ GET /api/schedules/sch_1 500 in 25ms
+ ⨯ ./src/app/api/customers/[id]/route.ts:100:1
+Parsing ecmascript source code failed
+[0m [90m  98 |[39m[0m
+[0m [90m  99 |[39m [90m// PUT /api/customers/[id] - 顧客更新[39m[0m
+[0m[31m[1m>[22m[39m[90m 100 |[39m [36mexport[39m [36mconst[39m [33mPUT[39m [33m=[39m withErrorHandling([36masync[39m ([0m
+[0m [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 101 |[39m   request[33m:[39m [33mNextRequest[39m[33m,[39m[0m
+[0m [90m 102 |[39m   { params }[33m:[39m { params[33m:[39m { id[33m:[39m string } }[0m
+[0m [90m 103 |[39m ) [33m=>[39m {[0m
+
+Expected ',', got 'export'
+
+
+ GET /api/customers/cust_1 500 in 22ms
+ ⨯ ./src/app/api/vehicles/[id]/route.ts:113:1
+Parsing ecmascript source code failed
+[0m [90m 111 |[39m[0m
+[0m [90m 112 |[39m [90m// PUT /api/vehicles/[id] - 車両更新[39m[0m
+[0m[31m[1m>[22m[39m[90m 113 |[39m [36mexport[39m [36mconst[39m [33mPUT[39m [33m=[39m withErrorHandling([36masync[39m ([0m
+[0m [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 114 |[39m   request[33m:[39m [33mNextRequest[39m[33m,[39m[0m
+[0m [90m 115 |[39m   { params }[33m:[39m { params[33m:[39m { id[33m:[39m string } }[0m
+[0m [90m 116 |[39m ) [33m=>[39m {[0m
+
+Expected ',', got 'export'
+
+
+ GET /api/vehicles/veh_1 500 in 22ms
+ ⨯ ./src/app/api/tasks/[id]/route.ts:90:5
+Parsing ecmascript source code failed
+[0m [90m 88 |[39m       data[33m:[39m task[33m,[39m[0m
+[0m [90m 89 |[39m     })[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 90 |[39m   } [36mcatch[39m (error) {[0m
+[0m [90m    |[39m     [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 91 |[39m     console[33m.[39merror([32m'タスク取得エラー:'[39m[33m,[39m error)[33m;[39m[0m
+[0m [90m 92 |[39m     [36mreturn[39m [33mNextResponse[39m[33m.[39mjson([0m
+[0m [90m 93 |[39m       {[0m
+
+Expected ',', got 'catch'
+
+
+ GET /api/tasks/task_1 500 in 23ms
+ ⨯ ./src/app/api/schedules/[id]/route.ts:303:2
+Parsing ecmascript source code failed
+[0m [90m 301 |[39m     )[33m;[39m[0m
+[0m [90m 302 |[39m   }[0m
+[0m[31m[1m>[22m[39m[90m 303 |[39m }[0m
+[0m [90m     |[39m  [31m[1m^[22m[39m[0m
+
+Unexpected eof
+
+
+ GET /api/schedules/nonexistent_123 500 in 20ms
+ GET /api/schedules?startDate=2024-01-01%27%20OR%201=1-- 500 in 32ms
+ GET /api/employees/emp_1 500 in 30ms
+ GET /api/schedules 500 in 35ms
+ GET /api/employees 500 in 34ms
+ GET /api/customers 500 in 32ms
+ GET /api/vehicles 500 in 32ms
+ GET /api/schedules 500 in 31ms
+ GET /api/tasks 500 in 31ms
+ GET /api/vehicle-usages 500 in 31ms
+ GET /api/employees 500 in 31ms
+ POST /api/employees 500 in 31ms
+ POST /api/employees 500 in 31ms
+ ⨯ ./src/app/api/schedules/[id]/route.ts:293:4
+Parsing ecmascript source code failed
+[0m [90m 291 |[39m     )[33m;[39m[0m
+[0m [90m 292 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 293 |[39m   })[33m;[39m[0m
+[0m [90m     |[39m    [31m[1m^[22m[39m[0m
+[0m [90m 294 |[39m })[33m;[39m[0m
+
+Expression expected
+
+
+ GET /api/schedules/sch_1 500 in 22ms
+ ⨯ ./src/app/api/customers/[id]/route.ts:84:4
+Parsing ecmascript source code failed
+[0m [90m 82 |[39m[0m
+[0m [90m 83 |[39m     [36mreturn[39m createSuccessResponse(customer)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 84 |[39m   })[33m;[39m[0m
+[0m [90m    |[39m    [31m[1m^[22m[39m[0m
+[0m [90m 85 |[39m })[33m;[39m[0m
+[0m [90m 86 |[39m[0m
+[0m [90m 87 |[39m [90m// PUT /api/customers/[id] - 顧客更新[39m[0m
+
+Expression expected
+
+
+ GET /api/customers/cust_1 500 in 24ms
+ ⨯ ./src/app/api/vehicles/[id]/route.ts:97:4
+Parsing ecmascript source code failed
+[0m [90m  95 |[39m[0m
+[0m [90m  96 |[39m     [36mreturn[39m createSuccessResponse(vehicleWithWarning)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m  97 |[39m   })[33m;[39m[0m
+[0m [90m     |[39m    [31m[1m^[22m[39m[0m
+[0m [90m  98 |[39m })[33m;[39m[0m
+[0m [90m  99 |[39m[0m
+[0m [90m 100 |[39m [90m// PUT /api/vehicles/[id] - 車両更新[39m[0m
+
+Expression expected
+
+
+ GET /api/vehicles/veh_1 500 in 23ms
+ ⨯ ./src/app/api/tasks/[id]/route.ts:227:1
+Parsing ecmascript source code failed
+[0m [90m 225 |[39m[0m
+[0m [90m 226 |[39m [90m// DELETE /api/tasks/[id] - タスク削除[39m[0m
+[0m[31m[1m>[22m[39m[90m 227 |[39m [36mexport[39m [36mconst[39m [33mDELETE[39m [33m=[39m withErrorHandling([36masync[39m ([0m
+[0m [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 228 |[39m   request[33m:[39m [33mNextRequest[39m[33m,[39m[0m
+[0m [90m 229 |[39m   { params }[33m:[39m { params[33m:[39m { id[33m:[39m string } }[0m
+[0m [90m 230 |[39m ) [33m=>[39m {[0m
+
+Expected ',', got 'export'
+
+
+ GET /api/tasks/task_1 500 in 20ms
+ ⨯ ./src/app/api/schedules/[id]/route.ts:293:4
+Parsing ecmascript source code failed
+[0m [90m 291 |[39m     )[33m;[39m[0m
+[0m [90m 292 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 293 |[39m   })[33m;[39m[0m
+[0m [90m     |[39m    [31m[1m^[22m[39m[0m
+[0m [90m 294 |[39m })[33m;[39m[0m
+
+Expression expected
+
+
+ GET /api/schedules/nonexistent_123 500 in 20ms
+ GET /api/schedules?startDate=2024-01-01%27%20OR%201=1-- 500 in 28ms
+ GET /api/employees/emp_1 500 in 27ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/customers/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/customers/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/customers/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/customers/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicles/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicles/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicles/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicles/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/tasks/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/tasks/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/tasks/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/tasks/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicle-usages/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicle-usages/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicle-usages/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicle-usages/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/customers/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/customers/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/customers/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/customers/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicles/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicles/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicles/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/vehicles/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/tasks/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/tasks/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/tasks/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/tasks/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/schedules/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[id]/[__metadata_id__]/route/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/app/api/employees/[id]/[__metadata_id__]/route/app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/tygen/ClaudeCode/schedule-management-app/.next/server/pages/_app/build-manifest.json'
+}

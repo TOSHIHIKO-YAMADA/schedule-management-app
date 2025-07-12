@@ -1,0 +1,13 @@
+@echo off
+echo Restarting development server...
+
+echo 1. Stopping any running processes...
+taskkill /F /IM node.exe 2>nul
+
+echo 2. Clearing Next.js cache...
+if exist .next rmdir /s /q .next
+
+echo 3. Starting development server...
+npx next dev --turbopack
+
+pause

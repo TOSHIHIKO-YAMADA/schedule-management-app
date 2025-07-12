@@ -1,0 +1,48 @@
+# 改行コードの自動変換設定
+# text=auto でGitが自動的にテキストファイルを検出し、適切な改行コードに変換
+* text=auto
+
+# 特定のファイルタイプの設定
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+*.env text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.eslintrc* text eol=lf
+.prettierrc* text eol=lf
+
+# バイナリファイルはそのまま
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
+*.mp4 binary
+*.mp3 binary
+*.zip binary
+*.gz binary
+*.tar binary
+
+# Windows用スクリプトはCRLFを維持
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Prismaスキーマファイル
+*.prisma text eol=lf
